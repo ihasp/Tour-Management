@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Tours.Data;
+using ToursNew.Data;
+using ToursNew.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,12 @@ builder.Services.AddDbContext<ToursContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<ITripRepository, TripRepository>();
+
+builder.Services.AddScoped<IClientRepository, ClientRepository>();  
+
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();    
 
 
 var app = builder.Build();

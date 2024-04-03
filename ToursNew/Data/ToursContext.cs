@@ -1,9 +1,8 @@
-﻿using Tours.Models;
+﻿using ToursNew.Models;
 using Microsoft.EntityFrameworkCore;
-using ToursNew.Models;
 
 
-namespace Tours.Data
+namespace ToursNew.Data
 {
     public class ToursContext : DbContext
     {

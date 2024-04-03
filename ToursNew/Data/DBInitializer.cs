@@ -1,9 +1,8 @@
 ﻿using Azure.Identity;
 using System.ComponentModel.DataAnnotations;
-using Tours.Models;
 using ToursNew.Models;
 
-namespace Tours.Data
+namespace ToursNew.Data
 {
     public static class DBInitializer
     {

@@ -3,26 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Tours.Data;
 using ToursNew.Models;
+using ToursNew.Repository;
 
 namespace ToursNew.Controllers
 {
     public class ReservationsController : Controller
     {
-        private readonly ToursContext _context;
+        private readonly IReservationRepository _reservationRepository;
 
-        public ReservationsController(ToursContext context)
+        public ReservationsController(IReservationRepository reservationRepository)
         {
-            _context = context;
+            _reservationRepository = reservationRepository;
         }
 
         // GET: Reservations
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Reservations.ToListAsync());
+            var reservations = await _reservationRepository.GetAllAsync();
+            return View(reservations);
         }
 
         // GET: Reservations/Details/5
@@ -33,8 +33,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var reservation = await _context.Reservations
-                .FirstOrDefaultAsync(m => m.IDReservation == id);
+            var reservation = await _reservationRepository.GetByIdAsync(id.Value);
             if (reservation == null)
             {
                 return NotFound();
@@ -50,16 +49,13 @@ namespace ToursNew.Controllers
         }
 
         // POST: Reservations/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IDReservation,IDClient,IDTrip,ReservationDate,paymentMethod,paymentStatus")] Reservation reservation)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(reservation);
-                await _context.SaveChangesAsync();
+                await _reservationRepository.AddAsync(reservation);
                 return RedirectToAction(nameof(Index));
             }
             return View(reservation);
@@ -73,7 +69,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var reservation = await _context.Reservations.FindAsync(id);
+            var reservation = await _reservationRepository.GetByIdAsync(id.Value);
             if (reservation == null)
             {
                 return NotFound();
@@ -82,8 +78,6 @@ namespace ToursNew.Controllers
         }
 
         // POST: Reservations/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IDReservation,IDClient,IDTrip,ReservationDate,paymentMethod,paymentStatus")] Reservation reservation)
@@ -97,12 +91,11 @@ namespace ToursNew.Controllers
             {
                 try
                 {
-                    _context.Update(reservation);
-                    await _context.SaveChangesAsync();
+                    await _reservationRepository.UpdateAsync(reservation);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ReservationExists(reservation.IDReservation))
+                    if (!await ReservationExists(reservation.IDReservation))
                     {
                         return NotFound();
                     }
@@ -124,8 +117,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var reservation = await _context.Reservations
-                .FirstOrDefaultAsync(m => m.IDReservation == id);
+            var reservation = await _reservationRepository.GetByIdAsync(id.Value);
             if (reservation == null)
             {
                 return NotFound();
@@ -139,19 +131,13 @@ namespace ToursNew.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var reservation = await _context.Reservations.FindAsync(id);
-            if (reservation != null)
-            {
-                _context.Reservations.Remove(reservation);
-            }
-
-            await _context.SaveChangesAsync();
+            await _reservationRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool ReservationExists(int id)
+        private async Task<bool> ReservationExists(int id)
         {
-            return _context.Reservations.Any(e => e.IDReservation == id);
+            return await _reservationRepository.GetByIdAsync(id) != null;
         }
     }
 }

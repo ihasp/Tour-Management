@@ -5,24 +5,26 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Tours.Data;
-using Tours.Models;
+using ToursNew.Data;
+using ToursNew.Models;
+using ToursNew.Repository;
 
 namespace ToursNew.Controllers
 {
     public class ClientsController : Controller
     {
-        private readonly ToursContext _context;
+        private readonly IClientRepository _clientRepository;
 
-        public ClientsController(ToursContext context)
+        public ClientsController(IClientRepository clientRepository)
         {
-            _context = context;
+            _clientRepository = clientRepository;   
         }
 
         // GET: Clients
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Clients.ToListAsync());
+            var clients = await _clientRepository.GetAllAsync();
+            return View(clients);
         }
 
         // GET: Clients/Details/5
@@ -33,8 +35,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.IDClient == id);
+            var client = await _clientRepository.GetByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
@@ -58,8 +59,7 @@ namespace ToursNew.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(client);
-                await _context.SaveChangesAsync();
+                await _clientRepository.AddAsync(client);   
                 return RedirectToAction(nameof(Index));
             }
             return View(client);
@@ -73,7 +73,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients.FindAsync(id);
+            var client = await _clientRepository.GetByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
@@ -97,8 +97,7 @@ namespace ToursNew.Controllers
             {
                 try
                 {
-                    _context.Update(client);
-                    await _context.SaveChangesAsync();
+                    await _clientRepository.UpdateAsync(client);    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -124,8 +123,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(m => m.IDClient == id);
+            var client = await _clientRepository.GetByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
@@ -139,19 +137,13 @@ namespace ToursNew.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var client = await _context.Clients.FindAsync(id);
-            if (client != null)
-            {
-                _context.Clients.Remove(client);
-            }
-
-            await _context.SaveChangesAsync();
+            await _clientRepository.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ClientExists(int id)
         {
-            return _context.Clients.Any(e => e.IDClient == id);
+            return _clientRepository.GetByIdAsync(id) != null;
         }
     }
 }
