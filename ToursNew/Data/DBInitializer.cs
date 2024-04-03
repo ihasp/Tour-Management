@@ -1,6 +1,7 @@
 ﻿using Azure.Identity;
 using System.ComponentModel.DataAnnotations;
 using Tours.Models;
+using ToursNew.Models;
 
 namespace Tours.Data
 {
@@ -10,44 +11,95 @@ namespace Tours.Data
         {
             context.Database.EnsureCreated();
 
-            if (context.Clients.Any())
+            if (context.Clients.Any() || context.Reservations.Any() || context.Trips.Any())
             {
                 return;
             }
 
-            var clients = new Client[]
+        var clients = new Client[]
+{
+            new Client
             {
-                new Client{Name="John Doe", Email="john@example.com", Phone="555-1234"},
-                new Client{Name="Alice Smith", Email="alice@example.com", Phone="555-5678"},
-                new Client{Name="Bob Johnson", Email="bob@example.com", Phone="555-9012"}
-
-            };
-
-            foreach (Client c in clients)
+                Name = "John",
+                LastName = "Doe",
+                Email = "john.doe@example.com",
+                Phone = "123-456-7890",
+                Adult = true
+            },
+            new Client
             {
-                context.Clients.Add(c);
-            }
+                Name = "Jane",
+                LastName = "Smith",
+                Email = "jane.smith@example.com",
+                Phone = "987-654-3210",
+                Adult = true
+            },
+            new Client
+            {
+                Name = "Alice",
+                LastName = "Doe",
+                Email = "alice.doe@example.com",
+                Phone = "456-789-0123",
+                Adult = false
+            },
+    
+        };
 
+            context.Clients.AddRange(clients);
             context.SaveChanges();
-
 
 
             var trips = new Trip[]
             {
-                new Trip {Destination="Puerto Rico", DepartureDate=DateTime.Parse("2024-06-22"), ReturnDate=DateTime.Parse("2024-08-22"),
-                    Price=2000, Description="Vacation in Puerto Rico", ClientID=1},
-                new Trip {Destination="Hawaii", DepartureDate=DateTime.Parse("2024-09-15"), ReturnDate=DateTime.Parse("2024-10-10"),
-                    Price=3000, Description="Honeymoon in Hawaii", ClientID=2},
-                new Trip {Destination="Bali", DepartureDate=DateTime.Parse("2024-07-10"),
-                    ReturnDate=DateTime.Parse("2024-07-25"), Price=2500, Description="Adventure in Bali", ClientID=3}
+                new Trip {
+                    Destination = "Paris",
+                    FromWhere = "New York",
+                    DepartureDate = DateTime.Parse("2024-05-01"),
+                    ReturnDate = DateTime.Parse("2024-05-10"),
+                    Price = 1500.00m,
+                    Description = "Explore the beautiful city of Paris." 
+                },
+
+                new Trip {
+                    Destination = "Tokyo",
+                    FromWhere = "Los Angeles",
+                    DepartureDate = DateTime.Parse("2024-06-15"),
+                    ReturnDate = DateTime.Parse("2024-06-25"),
+                    Price = 2000.00m,
+                    Description = "Experience the vibrant culture of Tokyo."
+                },
+                new Trip {
+                    Destination = "Rome",
+                    FromWhere = "London",
+                    DepartureDate = DateTime.Parse("2024-07-20"),
+                    ReturnDate = DateTime.Parse("2024-07-30"),
+                    Price = 1800.00m,
+                    Description = "Discover the ancient history of Rome."
+                },
             };
 
-            foreach(Trip t in trips)
-            {
-                context.Trips.Add(t);
-            }
+            context.Trips.AddRange(trips);
+            context.SaveChanges();
 
-            context.SaveChanges();  
+            var reservations = new Reservation[]
+            {
+                new Reservation {
+                    IDClient = clients.First().IDClient,
+                    IDTrip = trips.First().IDTrip,
+                    ReservationDate = DateTime.Now.AddDays(10),
+                    paymentMethod = PaymentMethod.CreditCard,
+                    paymentStatus = PaymentStatus.WentThrough
+                },
+                new Reservation {
+                    IDClient = clients.Last().IDClient,
+                    IDTrip = trips.Last().IDTrip,   
+                    ReservationDate = DateTime.Now.AddDays(15),
+                    paymentMethod = PaymentMethod.Paypal,
+                    paymentStatus = PaymentStatus.Pending
+                },
+            };
+            context.Reservations.AddRange(reservations);    
+            context.SaveChanges();
 
         }
     }

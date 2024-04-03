@@ -7,7 +7,7 @@
 <h1>Klienci</h1>
 
 <p>
-    <a asp-action="Create">Stwórz nowych</a>
+    <a class="btn btn-default btn-outline-dark" asp-action="Create">Dodaj</a>
 </p>
 <table class="table">
     <thead>
@@ -16,10 +16,16 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Email)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Adult)
             </th>
             <th></th>
         </tr>
@@ -31,15 +37,21 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Phone)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                @Html.DisplayFor(modelItem => item.Adult)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IDClient">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.IDClient">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.IDClient">Delete</a>
             </td>
         </tr>
 }

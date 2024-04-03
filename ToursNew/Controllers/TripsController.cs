@@ -22,8 +22,7 @@ namespace ToursNew.Controllers
         // GET: Trips
         public async Task<IActionResult> Index()
         {
-            var toursContext = _context.Trips.Include(t => t.Client);
-            return View(await toursContext.ToListAsync());
+            return View(await _context.Trips.ToListAsync());
         }
 
         // GET: Trips/Details/5
@@ -35,8 +34,7 @@ namespace ToursNew.Controllers
             }
 
             var trip = await _context.Trips
-                .Include(t => t.Client)
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.IDTrip == id);
             if (trip == null)
             {
                 return NotFound();
@@ -48,7 +46,6 @@ namespace ToursNew.Controllers
         // GET: Trips/Create
         public IActionResult Create()
         {
-            ViewData["ClientID"] = new SelectList(_context.Clients, "ID", "ID");
             return View();
         }
 
@@ -57,7 +54,7 @@ namespace ToursNew.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Destination,DepartureDate,ReturnDate,Price,Description,ClientID")] Trip trip)
+        public async Task<IActionResult> Create([Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] Trip trip)
         {
             if (ModelState.IsValid)
             {
@@ -65,7 +62,6 @@ namespace ToursNew.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientID"] = new SelectList(_context.Clients, "ID", "ID", trip.ClientID);
             return View(trip);
         }
 
@@ -82,7 +78,6 @@ namespace ToursNew.Controllers
             {
                 return NotFound();
             }
-            ViewData["ClientID"] = new SelectList(_context.Clients, "ID", "ID", trip.ClientID);
             return View(trip);
         }
 
@@ -91,9 +86,9 @@ namespace ToursNew.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Destination,DepartureDate,ReturnDate,Price,Description,ClientID")] Trip trip)
+        public async Task<IActionResult> Edit(int id, [Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] Trip trip)
         {
-            if (id != trip.ID)
+            if (id != trip.IDTrip)
             {
                 return NotFound();
             }
@@ -107,7 +102,7 @@ namespace ToursNew.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TripExists(trip.ID))
+                    if (!TripExists(trip.IDTrip))
                     {
                         return NotFound();
                     }
@@ -118,7 +113,6 @@ namespace ToursNew.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientID"] = new SelectList(_context.Clients, "ID", "ID", trip.ClientID);
             return View(trip);
         }
 
@@ -131,8 +125,7 @@ namespace ToursNew.Controllers
             }
 
             var trip = await _context.Trips
-                .Include(t => t.Client)
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.IDTrip == id);
             if (trip == null)
             {
                 return NotFound();
@@ -158,7 +151,7 @@ namespace ToursNew.Controllers
 
         private bool TripExists(int id)
         {
-            return _context.Trips.Any(e => e.ID == id);
+            return _context.Trips.Any(e => e.IDTrip == id);
         }
     }
 }
