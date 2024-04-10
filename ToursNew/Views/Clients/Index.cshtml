@@ -6,9 +6,36 @@
 
 <h1>Klienci</h1>
 
+
 <p>
     <a class="btn btn-default btn-outline-dark" asp-action="Create">Dodaj</a>
 </p>
+<div class="card">
+
+<div class="card align-self-auto align-content-center m-2">
+    <form asp-controller="Clients" asp-action="Sort" method="get" class="form-inline">
+        <div style ="display: flex;">
+            <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" default="hidden">
+                <option value="lastname_ascending">Sortuj po nazwisku alfabetycznie</option>
+                <option value="lastname_descending">Sortuj po nazwisku alfabetycznie malejąco</option>   
+           </select>
+           <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+        </div>
+    </form>
+</div>
+
+<div class="card align-self-auto align-content-center m-2">
+
+    <form asp-controller="Clients" asp-action="Search" method="get">
+        <div style="display: flex;">
+            <input placeholder="Wyszukaj klienta" type="text" class="form-control" id="searchString" name="searchString" />
+            <button type="submit" class="btn btn-outline-dark">Wyszukaj</button>
+        </div>
+    </form>
+</div>
+</div>
+
+
 <table class="table">
     <thead>
         <tr>

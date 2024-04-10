@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ToursNew.Data;
 using ToursNew.Repository;
+using ToursNew.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,10 @@ builder.Services.AddScoped<ITripRepository, TripRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();  
 
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();    
+
+builder.Services.AddScoped<IClientService, ClientService>();    
+
+
 
 
 var app = builder.Build();

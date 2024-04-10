@@ -8,25 +8,48 @@ using Microsoft.EntityFrameworkCore;
 using ToursNew.Data;
 using ToursNew.Models;
 using ToursNew.Repository;
+using ToursNew.Services;
+
 
 namespace ToursNew.Controllers
 {
     public class ClientsController : Controller
     {
-        private readonly IClientRepository _clientRepository;
+        private readonly IClientService _clientService;
 
-        public ClientsController(IClientRepository clientRepository)
+        public ClientsController(IClientService clientService)
         {
-            _clientRepository = clientRepository;   
+            _clientService = clientService; 
         }
 
         // GET: Clients
         public async Task<IActionResult> Index()
         {
-            var clients = await _clientRepository.GetAllAsync();
+            var clients = await _clientService.GetAllClientsAsync();
             return View(clients);
         }
 
+        // GET: Clients/Search
+
+        public async Task<IActionResult> Search(string searchString)
+        {
+            if (string.IsNullOrEmpty(searchString))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var searchResult = await _clientService.SearchClientsAsync(searchString);
+            return View("Index", searchResult);
+        }
+
+        // GET: Clients/Sort
+
+        public async Task<IActionResult> Sort(string sortOrder)
+        {
+            var sortedResults = await _clientService.SortClientsAsync(sortOrder);
+            return View("Index", sortedResults);
+        }
+            
         // GET: Clients/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -35,7 +58,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var client = await _clientRepository.GetByIdAsync(id.Value);
+            var client = await _clientService.GetClientsByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
@@ -50,6 +73,8 @@ namespace ToursNew.Controllers
             return View();
         }
 
+
+
         // POST: Clients/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -59,7 +84,7 @@ namespace ToursNew.Controllers
         {
             if (ModelState.IsValid)
             {
-                await _clientRepository.AddAsync(client);   
+                await _clientService.AddClientsAsync(client);   
                 return RedirectToAction(nameof(Index));
             }
             return View(client);
@@ -73,7 +98,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var client = await _clientRepository.GetByIdAsync(id.Value);
+            var client = await _clientService.GetClientsByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
@@ -97,7 +122,7 @@ namespace ToursNew.Controllers
             {
                 try
                 {
-                    await _clientRepository.UpdateAsync(client);    
+                    await _clientService.UpdateClientsAsync(client);    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -123,7 +148,7 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var client = await _clientRepository.GetByIdAsync(id.Value);
+            var client = await _clientService.GetClientsByIdAsync(id.Value);
             if (client == null)
             {
                 return NotFound();
@@ -137,13 +162,15 @@ namespace ToursNew.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _clientRepository.DeleteAsync(id);
+            await _clientService.DeleteClientsAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
         private bool ClientExists(int id)
         {
-            return _clientRepository.GetByIdAsync(id) != null;
+            return _clientService.GetClientsByIdAsync(id) != null;
         }
+
+
     }
 }

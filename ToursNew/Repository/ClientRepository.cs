@@ -16,6 +16,7 @@ namespace ToursNew.Repository
 
         }
 
+
         public async Task<IEnumerable<Client>> GetAllAsync()
         {
             return await _context.Clients.ToListAsync();
@@ -41,7 +42,7 @@ namespace ToursNew.Repository
         public async Task DeleteAsync(int id)
         {
             var client = await _context.Clients.FindAsync(id);
-            if (client == null)
+            if (client != null)
             {
                 _context.Clients.Remove(client);
                 await _context.SaveChangesAsync();
