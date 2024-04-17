@@ -7,9 +7,8 @@ namespace ToursNew.Services
         Task AddReservationsAsync(Reservation reservation);
         Task DeleteReservationsAsync(int id);
         Task<IEnumerable<Reservation>> GetAllReservationsAsync();
-        Task<Reservation> GetReservationsById(int id);
-        Task<IEnumerable<Reservation>> searchReservationASync(string searchString);
-        Task<IEnumerable<Reservation>> SortReservationsAsync(string sortOrder);
+        Task<Reservation> GetReservationsByIdAsync(int id);
+        Task <IEnumerable<Reservation>> SortReservationsAsync(string sortOrder);
         Task UpdateReservationsAsync(Reservation reservation);
     }
 }

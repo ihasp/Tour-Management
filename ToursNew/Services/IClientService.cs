@@ -9,7 +9,7 @@ namespace ToursNew.Services
         Task<IEnumerable<Client>> GetAllClientsAsync();
         Task<Client> GetClientsByIdAsync(int id);
         Task<IEnumerable<Client>> SearchClientsAsync(string searchString);
-        Task<IEnumerable<Client>> SortClientsAsync(string pickSortOrder);
+        Task <IEnumerable<Client>> SortClientsAsync(string pickSortOrder);
         Task UpdateClientsAsync(Client client);
     }
 }

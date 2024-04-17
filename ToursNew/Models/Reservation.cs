@@ -22,7 +22,6 @@ namespace ToursNew.Models
         public PaymentStatus paymentStatus { get; set; }    
 
     }
-
     public enum PaymentMethod
     {
         Cash,

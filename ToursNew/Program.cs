@@ -21,7 +21,11 @@ builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
 builder.Services.AddScoped<IClientService, ClientService>();    
 
+builder.Services.AddScoped<IReservationService, ReservationService>();
 
+builder.Services.AddScoped<ITripService, TripService>();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 
 var app = builder.Build();

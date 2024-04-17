@@ -13,9 +13,10 @@ namespace ToursNew.Repository
             _context = context;
         }
 
-        public async Task<IEnumerable<Trip>> GetAllAsync()
+        public IQueryable<Trip> GetAll()
         {
-            return await _context.Trips.ToListAsync();
+            IQueryable<Trip> tripquery = _context.Trips;
+            return tripquery;
         }
 
         public async Task<Trip> GetByIdAsync(int id)

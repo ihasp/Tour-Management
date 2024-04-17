@@ -16,10 +16,11 @@ namespace ToursNew.Repository
 
         }
 
-
-        public async Task<IEnumerable<Client>> GetAllAsync()
+        //zwracamy IQueryable - wykona się po stronie bazy danych
+        public IQueryable<Client> GetAll()
         {
-            return await _context.Clients.ToListAsync();
+            IQueryable<Client> clientquery = _context.Clients;
+            return clientquery;
         }
 
         public async Task<Client> GetByIdAsync(int id)

@@ -1,4 +1,5 @@
-﻿using ToursNew.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using ToursNew.Models;
 using ToursNew.Repository;
 
 
@@ -14,10 +15,10 @@ namespace ToursNew.Services
 
         public async Task<IEnumerable<Reservation>> GetAllReservationsAsync()
         {
-            return await _reservationRepository.GetAllAsync();
+            return await _reservationRepository.GetAll().ToListAsync();
         }
 
-        public async Task<Reservation> GetReservationsById(int id)
+        public async Task<Reservation> GetReservationsByIdAsync(int id)
         {
             return await _reservationRepository.GetByIdAsync(id);
         }
@@ -37,40 +38,28 @@ namespace ToursNew.Services
             await _reservationRepository.DeleteAsync(id);
         }
 
-        public async Task<IEnumerable<Reservation>> searchReservationASync(string searchString)
-        {
-            var reservations = await _reservationRepository.GetAllAsync();
-            try
-            {
-                return reservations.Where(r => r.paymentStatus.Equals(searchString));
-            }
-
-            catch (Exception ex)
-            {
-                return reservations.Where(r => r.paymentStatus.Equals("WentThrough"));
-            }
-
-        }
 
         public async Task<IEnumerable<Reservation>> SortReservationsAsync(string sortOrder)
         {
-            var reservations = await _reservationRepository.GetAllAsync();
+            var reservations = await _reservationRepository.GetAll().ToListAsync();
 
             switch (sortOrder)
             {
                 case "Cash":
-                    return reservations.OrderBy(r => r.paymentMethod.Equals("Cash"));
+                    return reservations.Where(r => r.paymentMethod == PaymentMethod.Cash);
                 case "Paypal":
-                    return reservations.OrderBy(r => r.paymentMethod.Equals("Paypal"));
+                    return reservations.Where(r => r.paymentMethod == PaymentMethod.Paypal);
                 case "Transfer":
-                    return reservations.OrderBy(r => r.paymentMethod.Equals("Transfer"));
+                    return reservations.Where(r => r.paymentMethod == PaymentMethod.Transfer);
                 case "CreditCard":
-                    return reservations.OrderBy(r => r.paymentMethod.Equals("CreditCard"));
+                    return reservations.Where(r => r.paymentMethod == PaymentMethod.CreditCard);
                 default:
                     return reservations.OrderBy(r => r.ReservationDate);
-
             }
         }
+
+
+
 
 
     }

@@ -1,5 +1,6 @@
 ﻿using ToursNew.Repository;
 using ToursNew.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ToursNew.Services
 {
@@ -12,9 +13,10 @@ namespace ToursNew.Services
             _clientRepository = clientRepository;
         }
 
+        //entity
         public async Task<IEnumerable<Client>> GetAllClientsAsync()
         {
-            return await _clientRepository.GetAllAsync();
+            return await _clientRepository.GetAll().ToListAsync();
         }
 
         public async Task<Client> GetClientsByIdAsync(int id)
@@ -39,13 +41,15 @@ namespace ToursNew.Services
 
         public async Task<IEnumerable<Client>> SearchClientsAsync(string searchString)
         {
-            var clients = await _clientRepository.GetAllAsync();
-            return clients.Where(s => s.Name.Contains(searchString) || s.LastName.Contains(searchString));
+            var clients = await _clientRepository.GetAll().ToListAsync();
+            return clients.Where(s => s.Name.Contains(searchString, StringComparison.CurrentCultureIgnoreCase) ||
+                                      s.LastName.Contains(searchString, StringComparison.CurrentCultureIgnoreCase));
         }
+
 
         public async Task<IEnumerable<Client>> SortClientsAsync(string pickSortOrder)
         {
-            var clients = await _clientRepository.GetAllAsync();
+            var clients = await _clientRepository.GetAll().ToListAsync();
 
             switch (pickSortOrder)
             {

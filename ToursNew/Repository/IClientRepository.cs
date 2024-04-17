@@ -6,7 +6,7 @@ namespace ToursNew.Repository
     {
         Task AddAsync(Client client);
         Task DeleteAsync(int id);
-        Task<IEnumerable<Client>> GetAllAsync();
+        IQueryable<Client> GetAll();
         Task<Client> GetByIdAsync(int id);
         Task UpdateAsync(Client client);
     }

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ToursNew.Models.Trip>
+﻿@model IEnumerable<ToursNew.ViewModels.TripViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -9,6 +9,37 @@
 <p>
     <a class ="btn btn-default btn-outline-dark" asp-action="Create">Dodaj wycieczkę</a>
 </p>
+
+<div class="card mb-2">
+    <div class="card align-self-auto align-content-center m-2">
+        <form asp-controller="Trips" asp-action="Sort" method="get" class="form-inline">
+            <div style="display: flex;">
+                <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" default="hidden">
+                    <option value="price_asc">Sortuj po cenie rosnąco</option>
+                    <option value="price_desc">Sortuj po cenie malejąco</option>
+                    <option value="destination_asc">Sortuj po celu rosnąco</option>
+                    <option value="destination_desc">Sortuj po celu malejąco</option>
+                    <option value="departure_asc">Sortuj po wylocie rosnąco</option>
+                    <option value="departure_desc">Sortuj po wylocie malejąco</option>
+                    <option value="return_asc">Sortuj po powrocie rosnąco</option>
+                    <option value="return_desc">Sortuj po powrocie malejąco</option>
+                </select>
+                <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card align-self-auto align-content-center m-2">
+
+        <form asp-controller="Trips" asp-action="Search" method="get">
+            <div style="display: flex;">
+                <input placeholder="Wyszukaj cel wycieczki" type="text" class="form-control" id="searchString" name="searchString" />
+                <button type="submit" class="btn btn-outline-dark">Wyszukaj</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ToursNew.Models.Reservation>
+﻿@model IEnumerable<ToursNew.ViewModels.ReservationViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -9,6 +9,23 @@
 <p>
     <a class="btn btn-default btn-outline-dark" asp-action="Create">Zarezerwuj</a>
 </p>
+
+<div class="card mb-2">
+<div class="card align-self-auto align-content-center m-2">
+    <form asp-controller="Reservations" asp-action="Sort" method="get" class="form-inline">
+        <div style ="display: flex;">
+            <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" default="hidden">
+                <option value="Cash">Zapłacone pieniędzmi</option>
+                <option value="Paypal">Zapłacone paypal</option>
+                 <option value="Transfer">Zapłacone przelewem</option>
+                    <option value="CreditCard">Zapłacone kartą kredytową</option>
+                </select>
+           <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+        </div>
+    </form>
+</div>
+</div>
+
 <table class="table">
     <thead>
         <tr>

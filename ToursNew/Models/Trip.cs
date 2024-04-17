@@ -15,7 +15,7 @@ namespace ToursNew.Models
         public DateTime DepartureDate { get; set; }
         public DateTime ReturnDate { get; set; }
         public decimal Price { get; set; }
-        public string Description { get; set; }
+        public string ?Description { get; set; }
     }
 }
 

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Elfie.Diagnostics;
 using Microsoft.EntityFrameworkCore;
-using ToursNew.Data;
 using ToursNew.Models;
-using ToursNew.Repository;
 using ToursNew.Services;
+using ToursNew.ViewModels;
 
 
 namespace ToursNew.Controllers
@@ -16,40 +17,22 @@ namespace ToursNew.Controllers
     public class ClientsController : Controller
     {
         private readonly IClientService _clientService;
+        private readonly IMapper _mapper;
 
-        public ClientsController(IClientService clientService)
+        public ClientsController(IClientService clientService, IMapper mapper)
         {
-            _clientService = clientService; 
+            _clientService = clientService;
+            _mapper = mapper;
         }
 
         // GET: Clients
         public async Task<IActionResult> Index()
         {
             var clients = await _clientService.GetAllClientsAsync();
-            return View(clients);
+            var clientViewModels = _mapper.Map<IEnumerable<ClientViewModel>>(clients);
+            return View(clientViewModels);
         }
 
-        // GET: Clients/Search
-
-        public async Task<IActionResult> Search(string searchString)
-        {
-            if (string.IsNullOrEmpty(searchString))
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            var searchResult = await _clientService.SearchClientsAsync(searchString);
-            return View("Index", searchResult);
-        }
-
-        // GET: Clients/Sort
-
-        public async Task<IActionResult> Sort(string sortOrder)
-        {
-            var sortedResults = await _clientService.SortClientsAsync(sortOrder);
-            return View("Index", sortedResults);
-        }
-            
         // GET: Clients/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -64,7 +47,29 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            return View(client);
+            var clientViewModel = _mapper.Map<ClientViewModel>(client);
+            return View(clientViewModel);
+        }
+
+        // GET: Clients/Search
+        public async Task<IActionResult> Search(string searchString)
+        {
+            if (string.IsNullOrEmpty(searchString))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var searchResult = await _clientService.SearchClientsAsync(searchString);
+            var clientViewModels = _mapper.Map<IEnumerable<ClientViewModel>>(searchResult);
+            return View("Index", clientViewModels);
+        }
+
+        // GET: Clients/Sort
+        public async Task<IActionResult> Sort(string sortOrder)
+        {
+            var sortedResults = await _clientService.SortClientsAsync(sortOrder);
+            var clientViewModels = _mapper.Map<IEnumerable<ClientViewModel>>(sortedResults);
+            return View("Index", clientViewModels);
         }
 
         // GET: Clients/Create
@@ -73,21 +78,18 @@ namespace ToursNew.Controllers
             return View();
         }
 
-
-
         // POST: Clients/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IDClient,Name,LastName,Email,Phone,Adult")] Client client)
+        public async Task<IActionResult> Create([Bind("IDClient,Name,LastName,Email,Phone,Adult")] ClientViewModel clientViewModel)
         {
             if (ModelState.IsValid)
             {
-                await _clientService.AddClientsAsync(client);   
+                var client = _mapper.Map<Client>(clientViewModel);
+                await _clientService.AddClientsAsync(client);
                 return RedirectToAction(nameof(Index));
             }
-            return View(client);
+            return View(clientViewModel);
         }
 
         // GET: Clients/Edit/5
@@ -103,26 +105,27 @@ namespace ToursNew.Controllers
             {
                 return NotFound();
             }
-            return View(client);
+
+            var clientViewModel = _mapper.Map<ClientViewModel>(client);
+            return View(clientViewModel);
         }
 
         // POST: Clients/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IDClient,Name,LastName,Email,Phone,Adult")] Client client)
+        public async Task<IActionResult> Edit(int id, [Bind("IDClient,Name,LastName,Email,Phone,Adult")] ClientViewModel clientViewModel)
         {
-            if (id != client.IDClient)
+            if (id != clientViewModel.IDClient)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
+                var client = _mapper.Map<Client>(clientViewModel);
                 try
                 {
-                    await _clientService.UpdateClientsAsync(client);    
+                    await _clientService.UpdateClientsAsync(client);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -137,7 +140,7 @@ namespace ToursNew.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(client);
+            return View(clientViewModel);
         }
 
         // GET: Clients/Delete/5
@@ -154,7 +157,8 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            return View(client);
+            var clientViewModel = _mapper.Map<ClientViewModel>(client);
+            return View(clientViewModel);
         }
 
         // POST: Clients/Delete/5
@@ -170,7 +174,5 @@ namespace ToursNew.Controllers
         {
             return _clientService.GetClientsByIdAsync(id) != null;
         }
-
-
     }
 }
