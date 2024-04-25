@@ -2,6 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using ToursNew.Data;
 using ToursNew.Repository;
 using ToursNew.Services;
+using FluentValidation;
+using ToursNew.Models;
+using ToursNew.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,11 @@ builder.Services.AddScoped<ITripService, TripService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.AddScoped<IValidator<Client>, ClientValidator>();
+
+builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
+
+builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
 
 var app = builder.Build();
 

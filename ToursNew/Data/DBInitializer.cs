@@ -86,15 +86,15 @@ namespace ToursNew.Data
                     IDClient = clients.First().IDClient,
                     IDTrip = trips.First().IDTrip,
                     ReservationDate = DateTime.Now.AddDays(10),
-                    paymentMethod = PaymentMethod.CreditCard,
-                    paymentStatus = PaymentStatus.WentThrough
+                    paymentMethod = PaymentMethod.Karta,
+                    paymentStatus = PaymentStatus.Potwierdzony
                 },
                 new Reservation {
                     IDClient = clients.Last().IDClient,
                     IDTrip = trips.Last().IDTrip,   
                     ReservationDate = DateTime.Now.AddDays(15),
                     paymentMethod = PaymentMethod.Paypal,
-                    paymentStatus = PaymentStatus.Pending
+                    paymentStatus = PaymentStatus.Oczekujący
                 },
             };
             context.Reservations.AddRange(reservations);    

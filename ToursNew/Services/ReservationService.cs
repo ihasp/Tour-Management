@@ -46,13 +46,13 @@ namespace ToursNew.Services
             switch (sortOrder)
             {
                 case "Cash":
-                    return reservations.Where(r => r.paymentMethod == PaymentMethod.Cash);
+                    return reservations.Where(r => r.paymentMethod == PaymentMethod.Pieniędzmi);
                 case "Paypal":
                     return reservations.Where(r => r.paymentMethod == PaymentMethod.Paypal);
                 case "Transfer":
-                    return reservations.Where(r => r.paymentMethod == PaymentMethod.Transfer);
+                    return reservations.Where(r => r.paymentMethod == PaymentMethod.Przelew);
                 case "CreditCard":
-                    return reservations.Where(r => r.paymentMethod == PaymentMethod.CreditCard);
+                    return reservations.Where(r => r.paymentMethod == PaymentMethod.Karta);
                 default:
                     return reservations.OrderBy(r => r.ReservationDate);
             }

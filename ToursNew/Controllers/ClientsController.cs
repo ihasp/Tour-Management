@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using ToursNew.Models;
 using ToursNew.Services;
 using ToursNew.ViewModels;
+using FluentValidation;
 
 
 namespace ToursNew.Controllers
@@ -18,11 +19,13 @@ namespace ToursNew.Controllers
     {
         private readonly IClientService _clientService;
         private readonly IMapper _mapper;
+        private readonly IValidator<Client> _validator;
 
-        public ClientsController(IClientService clientService, IMapper mapper)
+        public ClientsController(IClientService clientService, IMapper mapper, IValidator<Client> validator)
         {
             _clientService = clientService;
             _mapper = mapper;
+            _validator = validator;
         }
 
         // GET: Clients
@@ -85,9 +88,20 @@ namespace ToursNew.Controllers
         {
             if (ModelState.IsValid)
             {
-                var client = _mapper.Map<Client>(clientViewModel);
-                await _clientService.AddClientsAsync(client);
-                return RedirectToAction(nameof(Index));
+                Client client = _mapper.Map<Client>(clientViewModel);
+                var validationResult = await _validator.ValidateAsync(client);
+                if (validationResult.IsValid)
+                {
+                    await _clientService.AddClientsAsync(client);
+                    return RedirectToAction(nameof(Index));
+                }   
+                else
+                {
+                    foreach(var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                    }
+                }
             }
             return View(clientViewModel);
         }

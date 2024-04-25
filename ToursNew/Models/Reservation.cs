@@ -24,16 +24,16 @@ namespace ToursNew.Models
     }
     public enum PaymentMethod
     {
-        Cash,
+        Pieniędzmi,
         Paypal,
-        Transfer,
-        CreditCard
+        Przelew,
+        Karta
     }
 
     public enum PaymentStatus
     {
-        Pending,
-        Failed,
-        WentThrough
+        Oczekujący,
+        Nieudany,
+        Potwierdzony
     }
 }

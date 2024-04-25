@@ -8,7 +8,7 @@
 
 
 <p>
-    <a class="btn btn-default btn-outline-dark" asp-action="Create">Dodaj</a>
+    <a class="btn btn-outline-success" asp-action="Create">Dodaj</a>
 </p>
 
 <div class="card mb-2">
@@ -58,7 +58,7 @@
     </thead>
     <tbody>
 @foreach (var item in Model) {
-        <tr>
+        <tr class="justify-content-center">
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
@@ -74,10 +74,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Adult)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IDClient">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IDClient">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IDClient">Delete</a>
+            <td class="d-flex justify-content-end">
+                    <div class="mx-4">
+                <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDClient">Edytuj</a>
+                <a class="btn btn-outline-dark mx-1" asp-action="Details" asp-route-id="@item.IDClient">Szczegóły</a>
+                <a class="btn btn-outline-danger mx-2" asp-action="Delete" asp-route-id="@item.IDClient">Usuń</a>
+                    </div>
             </td>
         </tr>
 }
