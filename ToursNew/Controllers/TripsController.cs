@@ -9,6 +9,7 @@ using ToursNew.Models;
 using ToursNew.Services;
 using ToursNew.ViewModels;
 
+//TODO: implement fluentvalidation, like in clients controller (edit, create)
 namespace ToursNew.Controllers
 {
     public class TripsController : Controller
