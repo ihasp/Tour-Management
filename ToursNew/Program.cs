@@ -37,7 +37,7 @@ builder.Services.AddScoped<IValidator<Client>, ClientValidator>();
 
 builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
 
-builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
+builder.Services.AddScoped<IValidator<Trip>, TripValidator>();
 
 var app = builder.Build();
 
