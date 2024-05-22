@@ -10,11 +10,11 @@ namespace ToursNew.ViewModels
         [DisplayName("Miejsce wylotu")]
         public string ?FromWhere { get; set; }
         [DisplayName("Data wylotu")]
-        public DateTime DepartureDate { get; set; }
+        public DateTime ?DepartureDate { get; set; }
         [DisplayName("Data powrotu")]
-        public DateTime ReturnDate { get; set; }
+        public DateTime ?ReturnDate { get; set; }
         [DisplayName("Cena")]
-        public decimal Price { get; set; }
+        public decimal ?Price { get; set; }
         [DisplayName("Opis")]
         public string ?Description { get; set; }
     }

@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ToursNew.Models;
 using ToursNew.Services;
 using ToursNew.ViewModels;
 
-//TODO: implement fluentvalidation, like in clients controller (edit, create)
 namespace ToursNew.Controllers
 {
     public class TripsController : Controller
     {
         private readonly ITripService _tripService;
         private readonly IMapper _mapper;
+        private readonly IValidator<Trip> _validator;
 
-        public TripsController(ITripService tripService, IMapper mapper)
+        public TripsController(ITripService tripService, IMapper mapper, IValidator<Trip> validator)
         {
             _tripService = tripService;
             _mapper = mapper;
+            _validator = validator;
         }
 
         // GET: Trips
@@ -79,14 +76,26 @@ namespace ToursNew.Controllers
         // POST: Trips/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] Trip trip)
+        public async Task<IActionResult> Create([Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] TripViewModel tripViewModel)
         {
             if (ModelState.IsValid)
             {
-                await _tripService.AddTripAsync(trip);
-                return RedirectToAction(nameof(Index));
+                Trip trip = _mapper.Map<Trip>(tripViewModel);
+                var validationResult = await _validator.ValidateAsync(trip);
+                if (validationResult.IsValid)
+                {
+                    await _tripService.AddTripAsync(trip);
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                    }
+                }
             }
-            return View(trip);
+            return View(tripViewModel);
         }
 
         // GET: Trips/Edit/5
@@ -110,33 +119,42 @@ namespace ToursNew.Controllers
         // POST: Trips/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] Trip trip)
+        public async Task<IActionResult> Edit(int id, [Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] TripViewModel tripViewModel)
         {
-            if (id != trip.IDTrip)
+            if (id != tripViewModel.IDTrip)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
+
+                Trip trip = _mapper.Map<Trip>(tripViewModel);
+                var validationResult = await _validator.ValidateAsync(trip);
+
+                if (validationResult.IsValid)
                 {
-                    await _tripService.UpdateTripAsync(trip);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await TripExists(trip.IDTrip))
+                    try
+                    {
+                        await _tripService.UpdateTripAsync(trip);
+                    }
+                    catch
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                else
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                    }
+
+                }
+
             }
-            return View(trip);
+            return View(tripViewModel);
         }
 
         // GET: Trips/Delete/5

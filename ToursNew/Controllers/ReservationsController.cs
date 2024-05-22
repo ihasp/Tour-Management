@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ToursNew.Models;
 using ToursNew.Services;
 using ToursNew.ViewModels;
 
-//TODO: implement fluentvalidation, like in clients controller (edit, create)
 namespace ToursNew.Controllers
 {
     public class ReservationsController : Controller
     {
         private readonly IReservationService _reservationService;
         private readonly IMapper _mapper;
+        private readonly IValidator<Reservation> _validator;
 
-        public ReservationsController(IReservationService reservationService, IMapper mapper)
+        public ReservationsController(IReservationService reservationService, IMapper mapper, IValidator<Reservation> validator)
         {
             _reservationService = reservationService;
             _mapper = mapper;
+            _validator = validator;
         }
 
         // GET: Reservations
@@ -71,9 +68,20 @@ namespace ToursNew.Controllers
         {
             if (ModelState.IsValid)
             {
-                var reservation = _mapper.Map<Reservation>(reservationViewModel);
-                await _reservationService.AddReservationsAsync(reservation);
-                return RedirectToAction(nameof(Index));
+                Reservation reservation = _mapper.Map<Reservation>(reservationViewModel);
+                var validationResult = await _validator.ValidateAsync(reservation);
+                if (validationResult.IsValid)
+                {
+                    await _reservationService.AddReservationsAsync(reservation);
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                    }
+                }
             }
             return View(reservationViewModel);
         }
@@ -108,23 +116,29 @@ namespace ToursNew.Controllers
 
             if (ModelState.IsValid)
             {
-                var reservation = _mapper.Map<Reservation>(reservationViewModel);
-                try
+                Reservation reservation = _mapper.Map<Reservation>(reservationViewModel);
+                var validationResult = await _validator.ValidateAsync(reservation);
+                if (validationResult.IsValid)
                 {
-                    await _reservationService.UpdateReservationsAsync(reservation);
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await ReservationExists(reservation.IDReservation))
+                    try
                     {
+                        await _reservationService.UpdateReservationsAsync(reservation);
+                    }
+                    catch
+                    {
+
                         return NotFound();
                     }
-                    else
+                    return RedirectToAction(nameof(Index));
+
+                }
+                else
+                {
+                    foreach (var error in validationResult.Errors)
                     {
-                        throw;
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
             return View(reservationViewModel);
         }

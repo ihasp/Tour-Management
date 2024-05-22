@@ -8,9 +8,9 @@ namespace ToursNew.ViewModels
     {
         public int IDReservation { get; set; }
         [DisplayName("ID Klienta")]
-        public int IDClient { get; set; }
+        public int ?IDClient { get; set; }
         [DisplayName("ID Wycieczki")]
-        public int IDTrip { get; set; }
+        public int ?IDTrip { get; set; }
         [DisplayName("Data rezerwacji")]
         public DateTime ?ReservationDate { get; set; }
         [DisplayName("Metoda płatności")]
