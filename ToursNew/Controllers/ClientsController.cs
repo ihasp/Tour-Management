@@ -15,8 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ToursNew.Controllers
 {
-
-    [Authorize(Roles = "Admin, Manager")]
+    [Authorize(Roles = "User, Admin, Manager")]
     public class ClientsController : Controller
     {
         private readonly IClientService _clientService;
@@ -78,6 +77,7 @@ namespace ToursNew.Controllers
         }
 
         // GET: Clients/Create
+        [Authorize(Roles = "Admin, Manager")]
         public IActionResult Create()
         {
             return View();
@@ -109,6 +109,7 @@ namespace ToursNew.Controllers
         }
 
         // GET: Clients/Edit/5
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

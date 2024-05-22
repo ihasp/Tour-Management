@@ -71,28 +71,25 @@ using (var scope = app.Services.CreateScope())
         string userdefault = "user@gmail.com";
 
         var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
-        var user = await userManager.FindByEmailAsync(useradmin);
 
+        var user = await userManager.FindByEmailAsync(useradmin);
         if(user != null && !await userManager.IsInRoleAsync(user, "Admin"))
         {
             await userManager.AddToRoleAsync(user, "Admin");
         }
 
         user = await userManager.FindByEmailAsync(usermanager);
-
         if(user != null && !await userManager.IsInRoleAsync(user, "Manager"))
         {
             await userManager.AddToRoleAsync(user, "Manager");
         }
 
         user = await userManager.FindByEmailAsync(userdefault);
-
         if(user != null && !await userManager.IsInRoleAsync(user, "User"))
         {
             await userManager.AddToRoleAsync(user, "User");
         }
     }
-
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
