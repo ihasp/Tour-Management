@@ -25,8 +25,12 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Trips" asp-action="Index">Wycieczki</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Reservations" asp-action="Index">Rezerwacje</a>
+                        </li>
                     </ul>
                 </div>
+                <partial name="_LoginPartial" />
             </div>
         </nav>
     </header>
@@ -38,12 +42,13 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2024 - ToursNew - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2024 - Wycieczki - UBB <a asp-area="" asp-controller="Home" asp-action="Privacy">Prywatność</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+   
 </body>
 </html>

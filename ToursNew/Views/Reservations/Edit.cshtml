@@ -1,0 +1,51 @@
+﻿@model ToursNew.ViewModels.ReservationViewModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edytuj rezerwację</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IDReservation" />
+            <div class="form-group">
+                <label asp-for="IDClient" class="control-label"></label>
+                <input asp-for="IDClient" class="form-control" />
+                <span asp-validation-for="IDClient" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IDTrip" class="control-label"></label>
+                <input asp-for="IDTrip" class="form-control" />
+                <span asp-validation-for="IDTrip" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReservationDate" class="control-label"></label>
+                <input asp-for="ReservationDate" class="form-control" />
+                <span asp-validation-for="ReservationDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="paymentMethod" class="control-label"></label>
+                <select asp-for="paymentMethod" asp-items="Html.GetEnumSelectList<PaymentMethod>()" class="form-control"></select>
+                <span asp-validation-for="paymentMethod" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="paymentStatus" class="control-label"></label>
+                <select asp-for="paymentStatus" asp-items="Html.GetEnumSelectList<PaymentStatus>()" class="form-control"></select>
+                <span asp-validation-for="paymentStatus" class="text-danger"></span>
+            </div>
+            <div class="form-group my-2">
+                <input type="submit" value="Zapisz" class="btn btn-outline-success" />
+                <a class="btn btn-outline-dark" asp-action="Index">Powrót</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

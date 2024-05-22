@@ -1,21 +1,24 @@
-﻿@model Tours.Models.Client
+﻿@model ToursNew.ViewModels.ClientViewModel
 
 @{
     ViewData["Title"] = "Create";
 }
 
-<h1>Stwórz</h1>
-
-<h4>Klienci</h4>
+<h1>Dodaj klienta</h1>
 <hr />
 <div class="row">
-    <div class="card col-mx-4"  style="margin-bottom:15px;">
+    <div class="col-md-4">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Email" class="control-label"></label>
@@ -27,15 +30,17 @@
                 <input asp-for="Phone" class="form-control" />
                 <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" style="margin-top:10px; margin-bottom:10px;" />
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Adult" /> @Html.DisplayNameFor(model => model.Adult)
+                </label>
+            </div>
+            <div class="form-group my-2">
+                <input type="submit" value="Dodaj" class="btn btn-outline-primary" />
+                <a class="btn btn-outline-dark" asp-action="Index">Powrót</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

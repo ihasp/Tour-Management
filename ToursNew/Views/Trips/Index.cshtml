@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Tours.Models.Trip>
+﻿@model IEnumerable<ToursNew.ViewModels.TripViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -7,13 +7,47 @@
 <h1>Wycieczki</h1>
 
 <p>
-    <a asp-action="Create">Stwórz nową</a>
+    <a class ="btn btn-default btn-outline-dark" asp-action="Create">Dodaj wycieczkę</a>
 </p>
+
+<div class="card mb-2">
+    <div class="card align-self-auto align-content-center m-2">
+        <form asp-controller="Trips" asp-action="Sort" method="get" class="form-inline">
+            <div style="display: flex;">
+                <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" default="hidden">
+                    <option value="price_asc">Sortuj po cenie rosnąco</option>
+                    <option value="price_desc">Sortuj po cenie malejąco</option>
+                    <option value="destination_asc">Sortuj po celu rosnąco</option>
+                    <option value="destination_desc">Sortuj po celu malejąco</option>
+                    <option value="departure_asc">Sortuj po wylocie rosnąco</option>
+                    <option value="departure_desc">Sortuj po wylocie malejąco</option>
+                    <option value="return_asc">Sortuj po powrocie rosnąco</option>
+                    <option value="return_desc">Sortuj po powrocie malejąco</option>
+                </select>
+                <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="card align-self-auto align-content-center m-2">
+
+        <form asp-controller="Trips" asp-action="Search" method="get">
+            <div style="display: flex;">
+                <input placeholder="Wyszukaj cel wycieczki" type="text" class="form-control" id="searchString" name="searchString" />
+                <button type="submit" class="btn btn-outline-dark">Wyszukaj</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Destination)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FromWhere)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.DepartureDate)
@@ -27,9 +61,6 @@
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Client)
-            </th>
             <th></th>
         </tr>
     </thead>
@@ -38,6 +69,9 @@
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Destination)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FromWhere)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.DepartureDate)
@@ -51,13 +85,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Client.ID)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+            <td class="d-flex justify-content-end">
+                   <div class="mx-4">
+                    <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDTrip">Edytuj</a>
+                <a class="btn btn-outline-dark mx-1" asp-action="Details" asp-route-id="@item.IDTrip">Szczegóły</a>
+                    <a class="btn btn-outline-danger mx-2" asp-action="Delete" asp-route-id="@item.IDTrip">Usuń</a>
+                    </div>
             </td>
         </tr>
 }
