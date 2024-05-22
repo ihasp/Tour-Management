@@ -1,0 +1,78 @@
+﻿@model IEnumerable<ToursNew.ViewModels.ReservationViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Rezerwacje</h1>
+
+<p>
+    <a class="btn btn-default btn-outline-dark" asp-action="Create">Zarezerwuj</a>
+</p>
+
+<div class="card mb-2">
+<div class="card align-self-auto align-content-center m-2">
+    <form asp-controller="Reservations" asp-action="Sort" method="get" class="form-inline">
+        <div style ="display: flex;">
+            <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" default="hidden">
+                <option value="Cash">Zapłacone pieniędzmi</option>
+                <option value="Paypal">Zapłacone paypal</option>
+                 <option value="Transfer">Zapłacone przelewem</option>
+                    <option value="CreditCard">Zapłacone kartą kredytową</option>
+                </select>
+           <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+        </div>
+    </form>
+</div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IDClient)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IDTrip)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReservationDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.paymentMethod)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.paymentStatus)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.IDClient)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IDTrip)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReservationDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.paymentMethod)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.paymentStatus)
+            </td>
+            <td class="d-flex justify-content-end">
+                <div class="mx-4">
+                <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDReservation">Edytuj</a>
+                <a class="btn btn-outline-dark mx-1"asp-action="Details" asp-route-id="@item.IDReservation">Szczegóły</a>
+                <a class="btn btn-outline-danger mx-2" asp-action="Delete" asp-route-id="@item.IDReservation">Usuń</a>
+                    </div>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,47 @@
+﻿@model ToursNew.ViewModels.ReservationViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Szczegóły rezerwacji</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.IDClient)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.IDClient)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.IDTrip)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.IDTrip)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.ReservationDate)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.ReservationDate)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.paymentMethod)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.paymentMethod)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.paymentStatus)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.paymentStatus)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a class="btn btn-outline-primary" asp-action="Edit" asp-route-id="@Model?.IDReservation">Edytuj</a>
+    <a class="btn btn-outline-dark"asp-action="Index">Powrót</a>
+</div>

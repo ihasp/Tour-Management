@@ -1,29 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using Tours.Data;
-using Tours.Models;
+using ToursNew.Models;
+using ToursNew.Services;
+using ToursNew.ViewModels;
 
 namespace ToursNew.Controllers
 {
     public class TripsController : Controller
     {
-        private readonly ToursContext _context;
+        private readonly ITripService _tripService;
+        private readonly IMapper _mapper;
+        private readonly IValidator<Trip> _validator;
 
-        public TripsController(ToursContext context)
+        public TripsController(ITripService tripService, IMapper mapper, IValidator<Trip> validator)
         {
-            _context = context;
+            _tripService = tripService;
+            _mapper = mapper;
+            _validator = validator;
         }
 
         // GET: Trips
         public async Task<IActionResult> Index()
         {
-            var toursContext = _context.Trips.Include(t => t.Client);
-            return View(await toursContext.ToListAsync());
+            var trips = await _tripService.GetAllTripsAsync();
+            var tripViewModels = _mapper.Map<IEnumerable<TripViewModel>>(trips);
+            return View(tripViewModels);
+        }
+
+        // GET: Search
+        public async Task<IActionResult> Search(string searchString)
+        {
+            if (string.IsNullOrEmpty(searchString))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var searchResults = await _tripService.SearchTripASync(searchString);
+            var tripViewModels = _mapper.Map<IEnumerable<TripViewModel>>(searchResults);
+            return View("Index", tripViewModels);
+        }
+
+        // GET: Sort
+        public async Task<IActionResult> Sort(string sortOrder)
+        {
+            var sortedResults = await _tripService.SortTripsAsync(sortOrder);
+            var tripViewModels = _mapper.Map<IEnumerable<TripViewModel>>(sortedResults);
+            return View("Index", tripViewModels);
         }
 
         // GET: Trips/Details/5
@@ -34,39 +57,45 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var trip = await _context.Trips
-                .Include(t => t.Client)
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var trip = await _tripService.GetTripByIdAsync(id.Value);
             if (trip == null)
             {
                 return NotFound();
             }
 
-            return View(trip);
+            var tripViewModel = _mapper.Map<TripViewModel>(trip);
+            return View(tripViewModel);
         }
 
         // GET: Trips/Create
         public IActionResult Create()
         {
-            ViewData["ClientID"] = new SelectList(_context.Clients, "ID", "ID");
             return View();
         }
 
         // POST: Trips/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Destination,DepartureDate,ReturnDate,Price,Description,ClientID")] Trip trip)
+        public async Task<IActionResult> Create([Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] TripViewModel tripViewModel)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(trip);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                Trip trip = _mapper.Map<Trip>(tripViewModel);
+                var validationResult = await _validator.ValidateAsync(trip);
+                if (validationResult.IsValid)
+                {
+                    await _tripService.AddTripAsync(trip);
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    foreach (var error in validationResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
+                    }
+                }
             }
-            ViewData["ClientID"] = new SelectList(_context.Clients, "ID", "ID", trip.ClientID);
-            return View(trip);
+            return View(tripViewModel);
         }
 
         // GET: Trips/Edit/5
@@ -77,49 +106,52 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var trip = await _context.Trips.FindAsync(id);
+            var trip = await _tripService.GetTripByIdAsync(id.Value);
             if (trip == null)
             {
                 return NotFound();
             }
-            ViewData["ClientID"] = new SelectList(_context.Clients, "ID", "ID", trip.ClientID);
-            return View(trip);
+
+            var tripViewModel = _mapper.Map<TripViewModel>(trip);
+            return View(tripViewModel);
         }
 
         // POST: Trips/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Destination,DepartureDate,ReturnDate,Price,Description,ClientID")] Trip trip)
+        public async Task<IActionResult> Edit(int id, [Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] TripViewModel tripViewModel)
         {
-            if (id != trip.ID)
+            if (id != tripViewModel.IDTrip)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                try
+                Trip trip = _mapper.Map<Trip>(tripViewModel);
+                var validationResult = await _validator.ValidateAsync(trip);
+
+                if (validationResult.IsValid)
                 {
-                    _context.Update(trip);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!TripExists(trip.ID))
+                    try
+                    {
+                        await _tripService.UpdateTripAsync(trip);
+                    }
+                    catch
                     {
                         return NotFound();
                     }
-                    else
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    foreach (var error in validationResult.Errors)
                     {
-                        throw;
+                        ModelState.AddModelError(string.Empty, error.ErrorMessage);
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["ClientID"] = new SelectList(_context.Clients, "ID", "ID", trip.ClientID);
-            return View(trip);
+            return View(tripViewModel);
         }
 
         // GET: Trips/Delete/5
@@ -130,15 +162,14 @@ namespace ToursNew.Controllers
                 return NotFound();
             }
 
-            var trip = await _context.Trips
-                .Include(t => t.Client)
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var trip = await _tripService.GetTripByIdAsync(id.Value);
             if (trip == null)
             {
                 return NotFound();
             }
 
-            return View(trip);
+            var tripViewModel = _mapper.Map<TripViewModel>(trip);
+            return View(tripViewModel);
         }
 
         // POST: Trips/Delete/5
@@ -146,19 +177,13 @@ namespace ToursNew.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var trip = await _context.Trips.FindAsync(id);
-            if (trip != null)
-            {
-                _context.Trips.Remove(trip);
-            }
-
-            await _context.SaveChangesAsync();
+            await _tripService.DeleteTripAsync(id);
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TripExists(int id)
+        private async Task<bool> TripExists(int id)
         {
-            return _context.Trips.Any(e => e.ID == id);
+            return await _tripService.GetTripByIdAsync(id) != null;
         }
     }
 }
