@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToursNew.Models;
 using ToursNew.Services;
@@ -7,6 +8,7 @@ using ToursNew.ViewModels;
 
 namespace ToursNew.Controllers
 {
+    [Authorize(Roles = "User, Admin, Manager")]
     public class ReservationsController : Controller
     {
         private readonly IReservationService _reservationService;
@@ -55,6 +57,7 @@ namespace ToursNew.Controllers
         }
 
         // GET: Reservations/Create
+        [Authorize(Roles = "Admin, Manager")]
         public IActionResult Create()
         {
             return View();
@@ -86,6 +89,7 @@ namespace ToursNew.Controllers
         }
 
         // GET: Reservations/Edit/5
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

@@ -13,7 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ToursContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ToursContext>();
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ToursContext>()
+    .AddDefaultTokenProviders()
+    .AddDefaultUI();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -49,6 +53,42 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ToursContext>();
         DBInitializer.Initialize(context);
+        
+        //rolemanager 
+        var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+        var roles = new[] {"Admin","Manager", "User" };
+
+        foreach(var role in roles)
+        {
+            if(!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
+        }
+
+        string useradmin = "admin@gmail.com";
+        string usermanager = "manager@gmail.com";
+        string userdefault = "user@gmail.com";
+
+        var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
+
+        var user = await userManager.FindByEmailAsync(useradmin);
+        if(user != null && !await userManager.IsInRoleAsync(user, "Admin"))
+        {
+            await userManager.AddToRoleAsync(user, "Admin");
+        }
+
+        user = await userManager.FindByEmailAsync(usermanager);
+        if(user != null && !await userManager.IsInRoleAsync(user, "Manager"))
+        {
+            await userManager.AddToRoleAsync(user, "Manager");
+        }
+
+        user = await userManager.FindByEmailAsync(userdefault);
+        if(user != null && !await userManager.IsInRoleAsync(user, "User"))
+        {
+            await userManager.AddToRoleAsync(user, "User");
+        }
     }
     catch (Exception ex)
     {

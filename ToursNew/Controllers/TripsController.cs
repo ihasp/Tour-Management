@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToursNew.Models;
 using ToursNew.Services;
@@ -68,6 +69,7 @@ namespace ToursNew.Controllers
         }
 
         // GET: Trips/Create
+        [Authorize(Roles = "Admin, Manager")]
         public IActionResult Create()
         {
             return View();
@@ -99,6 +101,7 @@ namespace ToursNew.Controllers
         }
 
         // GET: Trips/Edit/5
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
