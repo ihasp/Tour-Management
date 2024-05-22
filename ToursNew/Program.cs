@@ -55,8 +55,6 @@ using (var scope = app.Services.CreateScope())
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occured during database creation.");
     }
-
-
 }
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

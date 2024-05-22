@@ -46,7 +46,6 @@ namespace ToursNew.Services
                                       s.LastName.Contains(searchString, StringComparison.CurrentCultureIgnoreCase));
         }
 
-
         public async Task<IEnumerable<Client>> SortClientsAsync(string pickSortOrder)
         {
             var clients = await _clientRepository.GetAll().ToListAsync();
@@ -61,10 +60,5 @@ namespace ToursNew.Services
                     return clients.OrderBy(s => s.LastName);
             }
         }
-
-
-
-
-
     }
 }

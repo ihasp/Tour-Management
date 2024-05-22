@@ -11,9 +11,7 @@ namespace ToursNew.Repository
 
         public ClientRepository(ToursContext context)
         {
-
             _context = context;
-
         }
 
         //zwracamy IQueryable - wykona się po stronie bazy danych
@@ -47,9 +45,7 @@ namespace ToursNew.Repository
             {
                 _context.Clients.Remove(client);
                 await _context.SaveChangesAsync();
-
             }
         }
-
     }
 }

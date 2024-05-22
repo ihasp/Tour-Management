@@ -128,7 +128,6 @@ namespace ToursNew.Controllers
 
             if (ModelState.IsValid)
             {
-
                 Trip trip = _mapper.Map<Trip>(tripViewModel);
                 var validationResult = await _validator.ValidateAsync(trip);
 
@@ -150,9 +149,7 @@ namespace ToursNew.Controllers
                     {
                         ModelState.AddModelError(string.Empty, error.ErrorMessage);
                     }
-
                 }
-
             }
             return View(tripViewModel);
         }

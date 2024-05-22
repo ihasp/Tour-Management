@@ -20,7 +20,6 @@ namespace ToursNew.Models
         public PaymentMethod paymentMethod {  get; set; }   
 
         public PaymentStatus paymentStatus { get; set; }    
-
     }
     public enum PaymentMethod
     {

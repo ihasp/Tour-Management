@@ -12,7 +12,6 @@ using ToursNew.Services;
 using ToursNew.ViewModels;
 using FluentValidation;
 
-
 namespace ToursNew.Controllers
 {
     public class ClientsController : Controller

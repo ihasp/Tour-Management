@@ -36,7 +36,6 @@ namespace ToursNew.Controllers
             return View("Index", reservationViewModels);
         }
 
-
         // GET: Reservations/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -126,11 +125,9 @@ namespace ToursNew.Controllers
                     }
                     catch
                     {
-
                         return NotFound();
                     }
                     return RedirectToAction(nameof(Index));
-
                 }
                 else
                 {

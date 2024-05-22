@@ -7,7 +7,6 @@ namespace ToursNew.Repository
     public class TripRepository : ITripRepository
     {
         private readonly ToursContext _context;
-
         public TripRepository(ToursContext context)
         {
             _context = context;

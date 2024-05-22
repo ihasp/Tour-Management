@@ -41,8 +41,7 @@ namespace ToursNew.Services
         {
             var trips = await _tripRepository.GetAll().ToListAsync();
             return trips.Where(t => t.Destination.Contains(searchString, StringComparison.CurrentCultureIgnoreCase) 
-                                    || t.Description.Contains(searchString, StringComparison.CurrentCultureIgnoreCase));
-                               
+                                    || t.Description.Contains(searchString, StringComparison.CurrentCultureIgnoreCase));                 
         }
 
         public async Task<IEnumerable<Trip>> SortTripsAsync(string sortOrder)
@@ -69,7 +68,6 @@ namespace ToursNew.Services
                     return trips.OrderByDescending(t => t.ReturnDate);
                 default:
                     return trips.OrderBy(t => t.DepartureDate);
-
             }
         }
     }

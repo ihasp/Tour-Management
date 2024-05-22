@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ToursNew.Models
-
 {
     public class Client
     {

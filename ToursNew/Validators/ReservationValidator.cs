@@ -11,5 +11,4 @@ namespace ToursNew.Validators
             RuleFor(r => r.IDTrip).NotEmpty().WithMessage("Klucz obcy ID Wycieczki nie może być puste");
         }
     }
-    
 }

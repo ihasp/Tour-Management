@@ -2,7 +2,6 @@
 using ToursNew.Models;
 using ToursNew.Repository;
 
-
 namespace ToursNew.Services
 {
     public class ReservationService : IReservationService
@@ -38,7 +37,6 @@ namespace ToursNew.Services
             await _reservationRepository.DeleteAsync(id);
         }
 
-
         public async Task<IEnumerable<Reservation>> SortReservationsAsync(string sortOrder)
         {
             var reservations = await _reservationRepository.GetAll().ToListAsync();
@@ -57,10 +55,5 @@ namespace ToursNew.Services
                     return reservations.OrderBy(r => r.ReservationDate);
             }
         }
-
-
-
-
-
     }
 }
