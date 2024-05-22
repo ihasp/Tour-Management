@@ -11,9 +11,12 @@ using ToursNew.Models;
 using ToursNew.Services;
 using ToursNew.ViewModels;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ToursNew.Controllers
 {
+
+    [Authorize(Roles = "Admin, Manager")]
     public class ClientsController : Controller
     {
         private readonly IClientService _clientService;
