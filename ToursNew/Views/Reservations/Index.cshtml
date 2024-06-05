@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Index";
 }
-
+<div class="min-vh-100">
 <h1>Rezerwacje</h1>
 
 <p>
@@ -11,19 +11,20 @@
 </p>
 
 <div class="card mb-2">
-<div class="card align-self-auto align-content-center m-2">
-    <form asp-controller="Reservations" asp-action="Sort" method="get" class="form-inline">
-        <div style ="display: flex;">
-            <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" default="hidden">
-                <option value="Cash">Zapłacone pieniędzmi</option>
-                <option value="Paypal">Zapłacone paypal</option>
-                 <option value="Transfer">Zapłacone przelewem</option>
-                    <option value="CreditCard">Zapłacone kartą kredytową</option>
-                </select>
-           <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+        <div class="card align-self-auto align-content-center m-2">
+            <form asp-controller="Reservations" asp-action="Sort" method="get" class="form-inline">
+                <div style="display: flex; width: 100%;">
+                    <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" style="flex-grow: 1; margin-right: 5px;">
+                        <option value="Cash">Zapłacone pieniędzmi</option>
+                        <option value="Paypal">Zapłacone paypal</option>
+                        <option value="Transfer">Zapłacone przelewem</option>
+                        <option value="CreditCard">Zapłacone kartą kredytową</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+                </div>
+            </form>
         </div>
-    </form>
-</div>
+
 </div>
 
 <table class="table">
@@ -69,10 +70,11 @@
                 <div class="mx-4">
                 <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDReservation">Edytuj</a>
                 <a class="btn btn-outline-dark mx-1"asp-action="Details" asp-route-id="@item.IDReservation">Szczegóły</a>
-                <a class="btn btn-outline-danger mx-2" asp-action="Delete" asp-route-id="@item.IDReservation">Usuń</a>
+                <a class="btn btn-outline-danger mx-1" asp-action="Delete" asp-route-id="@item.IDReservation">Usuń</a>
                     </div>
             </td>
         </tr>
 }
     </tbody>
 </table>
+</div>

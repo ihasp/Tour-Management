@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Index";
 }
-
+<div class="min-vh-100">
 <h1>Klienci</h1>
 
 <p>
@@ -10,23 +10,24 @@
 </p>
 
 <div class="card mb-2">
-<div class="card align-self-auto align-content-center m-2">
-    <form asp-controller="Clients" asp-action="Sort" method="get" class="form-inline">
-        <div style ="display: flex;">
-            <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" default="hidden">
-                <option value="lastname_ascending">Sortuj po nazwisku rosnąco</option>
-                <option value="lastname_descending">Sortuj po nazwisku malejąco</option>   
-           </select>
-           <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+        <div class="card align-self-auto align-content-center m-2">
+            <form asp-controller="Clients" asp-action="Sort" method="get" class="form-inline">
+                <div style="display: flex; width: 100%;">
+                    <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" style="flex-grow: 1; margin-right: 5px;">
+                        <option value="lastname_ascending">Sortuj po nazwisku rosnąco</option>
+                        <option value="lastname_descending">Sortuj po nazwisku malejąco</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+                </div>
+            </form>
         </div>
-    </form>
-</div>
+
 
 <div class="card align-self-auto align-content-center m-2">
 
     <form asp-controller="Clients" asp-action="Search" method="get">
         <div style="display: flex;">
-            <input placeholder="Wyszukaj klienta" type="text" class="form-control" id="searchString" name="searchString" />
+                    <input placeholder="Wyszukaj klienta" type="text" class="form-control" id="searchString" name="searchString" style="flex-grow: 1; margin-right: 5px;" />
             <button type="submit" class="btn btn-outline-dark">Wyszukaj</button>
         </div>
     </form>
@@ -76,10 +77,11 @@
                     <div class="mx-4">
                 <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDClient">Edytuj</a>
                 <a class="btn btn-outline-dark mx-1" asp-action="Details" asp-route-id="@item.IDClient">Szczegóły</a>
-                <a class="btn btn-outline-danger mx-2" asp-action="Delete" asp-route-id="@item.IDClient">Usuń</a>
+                <a class="btn btn-outline-danger mx-1" asp-action="Delete" asp-route-id="@item.IDClient">Usuń</a>
                     </div>
             </td>
         </tr>
 }
     </tbody>
 </table>
+</div>

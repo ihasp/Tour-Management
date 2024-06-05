@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Index";
 }
-
+<div class="min-vh-100">
 <h1>Wycieczki</h1>
 
 <p>
@@ -11,10 +11,11 @@
 </p>
 
 <div class="card mb-2">
+
     <div class="card align-self-auto align-content-center m-2">
         <form asp-controller="Trips" asp-action="Sort" method="get" class="form-inline">
-            <div style="display: flex;">
-                <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" default="hidden">
+            <div style="display: flex; width: 100%;">
+                    <select placeholder="Wybierz metodę sortowania" class="form-control w-100" style="flex-grow: 1; margin-right: 5px;" id="sortOrder" name="sortOrder">
                     <option value="price_asc">Sortuj po cenie rosnąco</option>
                     <option value="price_desc">Sortuj po cenie malejąco</option>
                     <option value="destination_asc">Sortuj po celu rosnąco</option>
@@ -24,20 +25,20 @@
                     <option value="return_asc">Sortuj po powrocie rosnąco</option>
                     <option value="return_desc">Sortuj po powrocie malejąco</option>
                 </select>
-                <button type="submit" class="btn btn-outline-dark">Sortuj</button>
+                <button type="submit" class="btn btn-outline-dark justify-self-end">Sortuj</button>
             </div>
         </form>
     </div>
 
     <div class="card align-self-auto align-content-center m-2">
-
         <form asp-controller="Trips" asp-action="Search" method="get">
             <div style="display: flex;">
-                <input placeholder="Wyszukaj cel wycieczki" type="text" class="form-control" id="searchString" name="searchString" />
-                <button type="submit" class="btn btn-outline-dark">Wyszukaj</button>
+                    <input placeholder="Wyszukaj cel wycieczki" type="text" class="form-control "style="flex-grow: 1; margin-right: 5px;" id="searchString" name="searchString" />
+                <button type="submit" class="btn btn-outline-dark justify-self-end">Wyszukaj</button>
             </div>
         </form>
     </div>
+
 </div>
 
 <table class="table">
@@ -85,14 +86,15 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
-            <td class="d-flex justify-content-end">
+                    <td class="d-flex justify-content-end">
                    <div class="mx-4">
                     <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDTrip">Edytuj</a>
-                <a class="btn btn-outline-dark mx-1" asp-action="Details" asp-route-id="@item.IDTrip">Szczegóły</a>
-                    <a class="btn btn-outline-danger mx-2" asp-action="Delete" asp-route-id="@item.IDTrip">Usuń</a>
+                    <a class="btn btn-outline-dark mx-1" asp-action="Details" asp-route-id="@item.IDTrip">Szczegóły</a>
+                    <a class="btn btn-outline-danger mx-1" asp-action="Delete" asp-route-id="@item.IDTrip">Usuń</a>
                     </div>
             </td>
         </tr>
 }
     </tbody>
 </table>
+</div>
