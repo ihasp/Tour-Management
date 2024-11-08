@@ -14,7 +14,7 @@ namespace ToursNew.Models
 
         [ForeignKey("Trip")]
         public int IDTrip { get; set;}
-
+        
         public DateTime ReservationDate { get; set; }   
 
         public PaymentMethod paymentMethod {  get; set; }   

@@ -158,6 +158,7 @@ namespace ToursNew.Controllers
         }
 
         // GET: Trips/Delete/5
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)

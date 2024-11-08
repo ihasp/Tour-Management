@@ -47,7 +47,6 @@ namespace ToursNew.Data
             context.Clients.AddRange(clients);
             context.SaveChanges();
 
-
             var trips = new Trip[]
             {
                 new Trip {
