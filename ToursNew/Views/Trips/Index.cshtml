@@ -4,45 +4,45 @@
     ViewData["Title"] = "Index";
 }
 <div class="min-vh-100">
-<h1>Wycieczki</h1>
+    <h1>Wycieczki</h1>
 
-<p>
-    <a class ="btn btn-default btn-outline-dark" asp-action="Create">Dodaj wycieczkę</a>
-</p>
+    <p>
+        <a class="btn btn-default btn-outline-dark" asp-action="Create">Dodaj wycieczkę</a>
+    </p>
 
-<div class="card mb-2">
+    <div class="card mb-2">
 
-    <div class="card align-self-auto align-content-center m-2">
-        <form asp-controller="Trips" asp-action="Sort" method="get" class="form-inline">
-            <div style="display: flex; width: 100%;">
+        <div class="card align-self-auto align-content-center m-2">
+            <form asp-controller="Trips" asp-action="Sort" method="get" class="form-inline">
+                <div style="display: flex; width: 100%;">
                     <select placeholder="Wybierz metodę sortowania" class="form-control w-100" style="flex-grow: 1; margin-right: 5px;" id="sortOrder" name="sortOrder">
-                    <option value="price_asc">Sortuj po cenie rosnąco</option>
-                    <option value="price_desc">Sortuj po cenie malejąco</option>
-                    <option value="destination_asc">Sortuj po celu rosnąco</option>
-                    <option value="destination_desc">Sortuj po celu malejąco</option>
-                    <option value="departure_asc">Sortuj po wylocie rosnąco</option>
-                    <option value="departure_desc">Sortuj po wylocie malejąco</option>
-                    <option value="return_asc">Sortuj po powrocie rosnąco</option>
-                    <option value="return_desc">Sortuj po powrocie malejąco</option>
-                </select>
-                <button type="submit" class="btn btn-outline-dark justify-self-end">Sortuj</button>
-            </div>
-        </form>
+                        <option value="price_asc">Sortuj po cenie rosnąco</option>
+                        <option value="price_desc">Sortuj po cenie malejąco</option>
+                        <option value="destination_asc">Sortuj po celu rosnąco</option>
+                        <option value="destination_desc">Sortuj po celu malejąco</option>
+                        <option value="departure_asc">Sortuj po wylocie rosnąco</option>
+                        <option value="departure_desc">Sortuj po wylocie malejąco</option>
+                        <option value="return_asc">Sortuj po powrocie rosnąco</option>
+                        <option value="return_desc">Sortuj po powrocie malejąco</option>
+                    </select>
+                    <button type="submit" class="btn btn-outline-dark justify-self-end">Sortuj</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card align-self-auto align-content-center m-2">
+            <form asp-controller="Trips" asp-action="Search" method="get">
+                <div style="display: flex;">
+                    <input placeholder="Wyszukaj cel wycieczki" type="text" class="form-control "style="flex-grow: 1; margin-right: 5px;" id="searchString" name="searchString"/>
+                    <button type="submit" class="btn btn-outline-dark justify-self-end">Wyszukaj</button>
+                </div>
+            </form>
+        </div>
+
     </div>
 
-    <div class="card align-self-auto align-content-center m-2">
-        <form asp-controller="Trips" asp-action="Search" method="get">
-            <div style="display: flex;">
-                    <input placeholder="Wyszukaj cel wycieczki" type="text" class="form-control "style="flex-grow: 1; margin-right: 5px;" id="searchString" name="searchString" />
-                <button type="submit" class="btn btn-outline-dark justify-self-end">Wyszukaj</button>
-            </div>
-        </form>
-    </div>
-
-</div>
-
-<table class="table">
-    <thead>
+    <table class="table">
+        <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Destination)
@@ -64,37 +64,38 @@
             </th>
             <th></th>
         </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Destination)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FromWhere)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DepartureDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReturnDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-                    <td class="d-flex justify-content-end">
-                   <div class="mx-4">
-                    <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDTrip">Edytuj</a>
-                    <a class="btn btn-outline-dark mx-1" asp-action="Details" asp-route-id="@item.IDTrip">Szczegóły</a>
-                    <a class="btn btn-outline-danger mx-1" asp-action="Delete" asp-route-id="@item.IDTrip">Usuń</a>
+        </thead>
+        <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Destination)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FromWhere)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DepartureDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ReturnDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td class="d-flex justify-content-end">
+                    <div class="mx-4">
+                        <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDTrip">Edytuj</a>
+                        <a class="btn btn-outline-dark mx-1" asp-action="Details" asp-route-id="@item.IDTrip">Szczegóły</a>
+                        <a class="btn btn-outline-danger mx-1" asp-action="Delete" asp-route-id="@item.IDTrip">Usuń</a>
                     </div>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
 </div>
