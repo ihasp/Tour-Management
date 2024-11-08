@@ -1,11 +1,5 @@
-﻿using System.ComponentModel;
+﻿namespace ToursNew.ViewModels;
 
-
-namespace ToursNew.ViewModels
+public class AdminViewModel
 {
-    public class AdminViewModel
-    {
-
-
-    }
 }

@@ -1,13 +1,12 @@
 ﻿using ToursNew.Models;
 
-namespace ToursNew.Repository
+namespace ToursNew.Repository;
+
+public interface ITripRepository
 {
-    public interface ITripRepository
-    {
-        Task AddAsync(Trip trip);
-        Task DeleteAsync(int id);
-        IQueryable<Trip> GetAll();
-        Task<Trip> GetByIdAsync(int id);
-        Task UpdateAsync(Trip trip);
-    }
+    Task AddAsync(Trip trip);
+    Task DeleteAsync(int id);
+    IQueryable<Trip> GetAll();
+    Task<Trip> GetByIdAsync(int id);
+    Task UpdateAsync(Trip trip);
 }
