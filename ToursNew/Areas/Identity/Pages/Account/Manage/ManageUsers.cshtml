@@ -1,0 +1,77 @@
+﻿@page
+@using RegisterModel = Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.RegisterModel
+@model ManageUsersModel
+@{
+ViewData["Title"] = "Manage Users";
+ViewData["ActivePage"] = ManageNavPages.AdminPanel;
+}
+
+<h2>Manage Users</h2>
+
+@if (TempData["Message"] != null)
+{
+<div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+<div class="alert alert-danger">@TempData["Error"]</div>
+}
+@await Html.PartialAsync("_RegisterPartial");
+
+
+<h3>Add New User</h3>
+
+<form method="post" asp-page-handler="AddUser">
+    <div asp-validation-summary="All" class="text-danger"></div><div class="form-group">
+        <label asp-for="NewUser.Username"></label>
+        <input asp-for="NewUser.Username" class="form-control" />
+        <span asp-validation-for="NewUser.Username" class="text-danger"></span> <!-- Error for Username -->
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NewUser.Email"></label>
+        <input asp-for="NewUser.Email" class="form-control" />
+        <span asp-validation-for="NewUser.Email" class="text-danger"></span> <!-- Error for Email -->
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NewUser.Password"></label>
+        <input asp-for="NewUser.Password" class="form-control" type="password" />
+        <span asp-validation-for="NewUser.Password" class="text-danger"></span> <!-- Error for Password -->
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add User</button>
+</form>
+
+<h3>Existing Users</h3>
+<table class="table">
+    <thead>
+    <tr>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var user in Model.Users)
+    {
+    <tr>
+        <td>@user.UserName</td>
+        <td>@user.Email</td>
+        <td>
+            <form method="post" asp-page-handler="UpdateUser" class="form-inline" style="display: inline-block;">
+                <input type="hidden" asp-for="EditUser.UserId" value="@user.Id" />
+                <input asp-for="EditUser.Username" value="@user.UserName" class="form-control mr-2" placeholder="Username" />
+                <input asp-for="EditUser.Email" value="@user.Email" class="form-control mr-2" placeholder="Email" />
+                <button type="submit" class="btn btn-primary mr-2">Update</button>
+            </form>
+
+            <form method="post" asp-page-handler="DeleteUser" style="display:inline;">
+                <input type="hidden" name="userId" value="@user.Id" />
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+            </form>
+        </td>
+    </tr>
+    }
+    </tbody>
+</table>
