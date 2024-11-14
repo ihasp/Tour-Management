@@ -1,5 +1,4 @@
 ﻿@page
-@using RegisterModel = Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.RegisterModel
 @model ManageUsersModel
 @{
 ViewData["Title"] = "Manage Users";
@@ -16,31 +15,30 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
 {
 <div class="alert alert-danger">@TempData["Error"]</div>
 }
-@await Html.PartialAsync("_RegisterPartial");
-
 
 <h3>Add New User</h3>
 
-<form method="post" asp-page-handler="AddUser">
-    <div asp-validation-summary="All" class="text-danger"></div><div class="form-group">
-        <label asp-for="NewUser.Username"></label>
-        <input asp-for="NewUser.Username" class="form-control" />
-        <span asp-validation-for="NewUser.Username" class="text-danger"></span> <!-- Error for Username -->
+<form method="post" asp-page-handler="AddUser" role="alert">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="InputUserModel.Email"></label>
+        <input asp-for="InputUserModel.Email" class="form-control"/>
+        <span asp-validation-for="InputUserModel.Email" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="NewUser.Email"></label>
-        <input asp-for="NewUser.Email" class="form-control" />
-        <span asp-validation-for="NewUser.Email" class="text-danger"></span> <!-- Error for Email -->
+        <label asp-for="InputUserModel.Password"></label>
+        <input asp-for="InputUserModel.Password" class="form-control" type="password" />
+        <span asp-validation-for="InputUserModel.Password" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="NewUser.Password"></label>
-        <input asp-for="NewUser.Password" class="form-control" type="password" />
-        <span asp-validation-for="NewUser.Password" class="text-danger"></span> <!-- Error for Password -->
+        <label asp-for="InputUserModel.ConfirmPassword"></label>
+        <input asp-for="InputUserModel.ConfirmPassword" class="form-control" type="password" />
+        <span asp-validation-for="InputUserModel.ConfirmPassword" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Add User</button>
+    <button type="submit" class="btn btn-primary">Create User</button> <br/>
 </form>
 
 <h3>Existing Users</h3>

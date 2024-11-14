@@ -62,7 +62,7 @@ using (var scope = app.Services.CreateScope())
             if (!await roleManager.RoleExistsAsync(role))
                 await roleManager.CreateAsync(new IdentityRole(role));
 
-        var useradmin = "admin@gmail.com";
+        var useradmin = "admin2@gmail.com";
         var usermanager = "manager@gmail.com";
         var userdefault = "user@gmail.com";
 
