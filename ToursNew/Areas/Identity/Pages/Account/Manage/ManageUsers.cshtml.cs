@@ -26,12 +26,12 @@ public class ManageUsersModel : PageModel
     public List<IdentityUser> Users { get; set; }
 
     [BindProperty]
-    public CreateUserInputModel InputUserModel { get; set; }
+    public AddUserInputModel InputUserModel { get; set; }
 
     [BindProperty]
     public UpdateUserInputModel EditUser { get; set; }
         
-    public class CreateUserInputModel
+    public class AddUserInputModel
     {
         [Required]
         [EmailAddress]
@@ -71,10 +71,10 @@ public class ManageUsersModel : PageModel
 
     public async Task<IActionResult> OnPostAddUserAsync()
     {
+        _logger.LogInformation("Adding user");
         if (!ModelState.IsValid)
         {
             _logger.LogError("Model state invalid");
-            return Page();
         }
 
         var user = new IdentityUser {UserName = InputUserModel.Email, Email = InputUserModel.Email};
