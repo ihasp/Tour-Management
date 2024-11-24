@@ -1,6 +1,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ToursNew.Data;
 using ToursNew.Models;
 using ToursNew.Repository;
@@ -13,22 +14,33 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ToursContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+        options.User.RequireUniqueEmail = true;
+    })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ToursContext>()
     .AddDefaultTokenProviders()
     .AddDefaultUI();
 
+//logging part
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
 
+//repos
 builder.Services.AddScoped<ITripRepository, TripRepository>();
 
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 
 builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
+//services
 builder.Services.AddScoped<IClientService, ClientService>();
 
 builder.Services.AddScoped<IReservationService, ReservationService>();
@@ -37,11 +49,16 @@ builder.Services.AddScoped<ITripService, TripService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//validators
 builder.Services.AddScoped<IValidator<Client>, ClientValidator>();
 
 builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
 
 builder.Services.AddScoped<IValidator<Trip>, TripValidator>();
+
+//activity logger
+builder.Services.AddScoped<IActivityLogger, ActivityLogger>();
+
 
 var app = builder.Build();
 
@@ -62,7 +79,7 @@ using (var scope = app.Services.CreateScope())
             if (!await roleManager.RoleExistsAsync(role))
                 await roleManager.CreateAsync(new IdentityRole(role));
 
-        var useradmin = "admin2@gmail.com";
+        var useradmin = "admin@gmail.com";
         var usermanager = "manager@gmail.com";
         var userdefault = "user@gmail.com";
 

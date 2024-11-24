@@ -3,22 +3,26 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using NuGet.Protocol.Core.Types;
+using ToursNew.Data;
+using ToursNew.Models;
 
 #nullable disable
 
 namespace ToursNew.Areas.Identity.Pages.Account.Manage;
 
-    
 public class ManageUsersModel : PageModel
 {
     private UserManager<IdentityUser> _userManager;
     private readonly ILogger<ManageUsersModel> _logger;
-    public ManageUsersModel(UserManager<IdentityUser> userManager, ILogger<ManageUsersModel> logger, RoleManager<IdentityRole> roleManager)
+    private readonly ToursContext _context;
+    public ManageUsersModel(UserManager<IdentityUser> userManager, ILogger<ManageUsersModel> logger, RoleManager<IdentityRole> roleManager, ToursContext context)
     {
         _userManager = userManager;
         _logger = logger;
+        _context = context;
     }
 
     
@@ -63,10 +67,16 @@ public class ManageUsersModel : PageModel
         [Display(Name = "Username")]
         public string Username { get; set; }
     }
-
+    
+    [BindProperty]
+    public List<ActivityLogs> ActivityLogs { get; set; }
     public async Task OnGetAsync()
     {
         Users = _userManager.Users.ToList();
+        Users = _userManager.Users.ToList();
+        ActivityLogs = await _context.ActivityLogs
+            .OrderByDescending(log => log.Timestamp)
+            .ToListAsync();
     }
 
     public async Task<IActionResult> OnPostAddUserAsync()
@@ -140,4 +150,13 @@ public class ManageUsersModel : PageModel
 
         return RedirectToPage();
     }
+    
+    public async Task<IActionResult> OnPostClearLogsAsync()
+    {
+        _context.ActivityLogs.RemoveRange(_context.ActivityLogs); // Clear all logs
+        await _context.SaveChangesAsync(); // Save changes to the database
+        TempData["Message"] = "All logs have been cleared.";
+        return RedirectToPage(); // Refresh the page
+    }
+    
 }
