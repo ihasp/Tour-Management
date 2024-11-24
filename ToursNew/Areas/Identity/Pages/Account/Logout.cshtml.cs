@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using ToursNew.Services;
 
 namespace ToursNew.Areas.Identity.Pages.Account
 {
@@ -16,17 +17,18 @@ namespace ToursNew.Areas.Identity.Pages.Account
     {
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
-
-        public LogoutModel(SignInManager<IdentityUser> signInManager, ILogger<LogoutModel> logger)
+        private readonly IActivityLogger _activityLogger;
+        public LogoutModel(SignInManager<IdentityUser> signInManager, ILogger<LogoutModel> logger, IActivityLogger activityLogger)
         {
             _signInManager = signInManager;
             _logger = logger;
+            _activityLogger = activityLogger;
         }
 
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
+            await _activityLogger.LogAsync("Logout", User.Identity.Name, $"User logged out.");
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);

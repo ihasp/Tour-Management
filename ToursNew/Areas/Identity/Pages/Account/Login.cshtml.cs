@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using ToursNew.Services;
 
 namespace ToursNew.Areas.Identity.Pages.Account;
 
@@ -15,11 +16,13 @@ public class LoginModel : PageModel
 {
     private readonly ILogger<LoginModel> _logger;
     private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IActivityLogger _activityLogger;
 
-    public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger)
+    public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, IActivityLogger activityLogger)
     {
         _signInManager = signInManager;
         _logger = logger;
+        _activityLogger = activityLogger;
     }
 
     /// <summary>
@@ -75,8 +78,12 @@ public class LoginModel : PageModel
             var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, false);
             if (result.Succeeded)
             {
-                _logger.LogInformation("User logged in.");
+                await _activityLogger.LogAsync("Login", User.Identity.Name, $"User logged in.");
                 return LocalRedirect(returnUrl);
+            }
+            else
+            {
+                await _activityLogger.LogAsync("Failed Login", $"{Input.Email}", $"Failed login attempt for the user");
             }
 
             if (result.RequiresTwoFactor)
