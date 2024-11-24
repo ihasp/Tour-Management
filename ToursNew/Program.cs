@@ -1,11 +1,12 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using ToursNew.Data;
+using ToursNew.Models;
 using ToursNew.Repository;
 using ToursNew.Services;
-using FluentValidation;
-using ToursNew.Models;
 using ToursNew.Validators;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,23 +14,34 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ToursContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+        options.User.RequireUniqueEmail = true;
+    })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ToursContext>()
     .AddDefaultTokenProviders()
     .AddDefaultUI();
 
+//logging part
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
 
+//repos
 builder.Services.AddScoped<ITripRepository, TripRepository>();
 
-builder.Services.AddScoped<IClientRepository, ClientRepository>();  
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 
-builder.Services.AddScoped<IReservationRepository, ReservationRepository>();    
+builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
-builder.Services.AddScoped<IClientService, ClientService>();    
+//services
+builder.Services.AddScoped<IClientService, ClientService>();
 
 builder.Services.AddScoped<IReservationService, ReservationService>();
 
@@ -37,11 +49,16 @@ builder.Services.AddScoped<ITripService, TripService>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+//validators
 builder.Services.AddScoped<IValidator<Client>, ClientValidator>();
 
 builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
 
 builder.Services.AddScoped<IValidator<Trip>, TripValidator>();
+
+//activity logger
+builder.Services.AddScoped<IActivityLogger, ActivityLogger>();
+
 
 var app = builder.Build();
 
@@ -53,42 +70,32 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<ToursContext>();
         DBInitializer.Initialize(context);
-        
+
         //rolemanager 
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-        var roles = new[] {"Admin","Manager", "User" };
+        var roles = new[] { "Admin", "Manager", "User" };
 
-        foreach(var role in roles)
-        {
-            if(!await roleManager.RoleExistsAsync(role))
-            {
+        foreach (var role in roles)
+            if (!await roleManager.RoleExistsAsync(role))
                 await roleManager.CreateAsync(new IdentityRole(role));
-            }
-        }
 
-        string useradmin = "admin@gmail.com";
-        string usermanager = "manager@gmail.com";
-        string userdefault = "user@gmail.com";
+        var useradmin = "admin@gmail.com";
+        var usermanager = "manager@gmail.com";
+        var userdefault = "user@gmail.com";
 
         var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
         var user = await userManager.FindByEmailAsync(useradmin);
-        if(user != null && !await userManager.IsInRoleAsync(user, "Admin"))
-        {
+        if (user != null && !await userManager.IsInRoleAsync(user, "Admin"))
             await userManager.AddToRoleAsync(user, "Admin");
-        }
 
         user = await userManager.FindByEmailAsync(usermanager);
-        if(user != null && !await userManager.IsInRoleAsync(user, "Manager"))
-        {
+        if (user != null && !await userManager.IsInRoleAsync(user, "Manager"))
             await userManager.AddToRoleAsync(user, "Manager");
-        }
 
         user = await userManager.FindByEmailAsync(userdefault);
-        if(user != null && !await userManager.IsInRoleAsync(user, "User"))
-        {
+        if (user != null && !await userManager.IsInRoleAsync(user, "User"))
             await userManager.AddToRoleAsync(user, "User");
-        }
     }
     catch (Exception ex)
     {
@@ -96,6 +103,7 @@ using (var scope = app.Services.CreateScope())
         logger.LogError(ex, "An error occured during database creation.");
     }
 }
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -115,7 +123,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    "default",
+    "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
