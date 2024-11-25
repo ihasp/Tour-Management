@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using ToursNew.Services;
 
 namespace ToursNew.Areas.Identity.Pages.Account
 {
@@ -17,11 +18,12 @@ namespace ToursNew.Areas.Identity.Pages.Account
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-
-        public ConfirmEmailChangeModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        private readonly IActivityLogger _activityLogger;
+        public ConfirmEmailChangeModel(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, IActivityLogger activityLogger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _activityLogger = activityLogger;
         }
 
         /// <summary>
@@ -41,6 +43,7 @@ namespace ToursNew.Areas.Identity.Pages.Account
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
+                await _activityLogger.LogAsync("User name FindBy", User.Identity.Name, "Error during user name change");
                 return NotFound($"Unable to load user with ID '{userId}'.");
             }
 
@@ -48,6 +51,7 @@ namespace ToursNew.Areas.Identity.Pages.Account
             var result = await _userManager.ChangeEmailAsync(user, email, code);
             if (!result.Succeeded)
             {
+                await _activityLogger.LogAsync("Email change", User.Identity.Name, "Error during email change");
                 StatusMessage = "Error changing email.";
                 return Page();
             }
@@ -57,12 +61,14 @@ namespace ToursNew.Areas.Identity.Pages.Account
             var setUserNameResult = await _userManager.SetUserNameAsync(user, email);
             if (!setUserNameResult.Succeeded)
             {
+                await _activityLogger.LogAsync("User name change", User.Identity.Name, "Error during user name change");
                 StatusMessage = "Error changing user name.";
                 return Page();
             }
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Thank you for confirming your email change.";
+            await _activityLogger.LogAsync("Email change", User.Identity.Name, "User successfully changed their email");
             return Page();
         }
     }
