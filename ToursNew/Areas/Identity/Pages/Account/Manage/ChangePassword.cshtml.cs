@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using ToursNew.Services;
 
 namespace ToursNew.Areas.Identity.Pages.Account.Manage
 {
@@ -17,15 +18,18 @@ namespace ToursNew.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<ChangePasswordModel> _logger;
+        private readonly IActivityLogger _activityLogger;
 
         public ChangePasswordModel(
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
-            ILogger<ChangePasswordModel> logger)
+            ILogger<ChangePasswordModel> logger,
+            IActivityLogger activityLogger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _activityLogger = activityLogger;
         }
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace ToursNew.Areas.Identity.Pages.Account.Manage
             /// </summary>
             [Required]
             [RegularExpression("^(?=.{6,32}$)(?=.*[A-Z])(?=.*[a-z])(?!.*(.)\\1).+$",
-                ErrorMessage = "Hasło musi mieć conajmniej 6 znaków i nie mogą się powtarzać, posiadać conajmniej jedną dużą literę, oraz   nie może być puste")]
+                ErrorMessage = "Hasło musi mieć conajmniej 6 znaków i nie mogą się powtarzać, posiadać conajmniej jedną dużą literę, oraz nie może być puste")]
            // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "New password")]
@@ -121,9 +125,10 @@ namespace ToursNew.Areas.Identity.Pages.Account.Manage
             }
 
             await _signInManager.RefreshSignInAsync(user);
+            await _activityLogger.LogAsync("Password change", User.Identity.Name, "User changed their password");
             _logger.LogInformation("User changed their password successfully.");
             StatusMessage = "Your password has been changed.";
-
+            
             return RedirectToPage();
         }
     }

@@ -44,7 +44,7 @@ public class ManageUsersModel : PageModel
             
         [Required]
         [RegularExpression("^(?=.{6,32}$)(?=.*[A-Z])(?=.*[a-z])(?!.*(.)\\1).+$",
-            ErrorMessage = "Hasło musi mieć conajmniej 6 znaków i nie mogą się powtarzać")]
+            ErrorMessage = "Hasło musi mieć conajmniej 6 znaków i nie mogą się powtarzać, posiadać conajmniej jedną dużą literę, oraz nie może być puste")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -72,7 +72,6 @@ public class ManageUsersModel : PageModel
     public List<ActivityLogs> ActivityLogs { get; set; }
     public async Task OnGetAsync()
     {
-        Users = _userManager.Users.ToList();
         Users = _userManager.Users.ToList();
         ActivityLogs = await _context.ActivityLogs
             .OrderByDescending(log => log.Timestamp)
@@ -153,10 +152,24 @@ public class ManageUsersModel : PageModel
     
     public async Task<IActionResult> OnPostClearLogsAsync()
     {
-        _context.ActivityLogs.RemoveRange(_context.ActivityLogs); // Clear all logs
-        await _context.SaveChangesAsync(); // Save changes to the database
+        _context.ActivityLogs.RemoveRange(_context.ActivityLogs);
+        await _context.SaveChangesAsync(); 
         TempData["Message"] = "All logs have been cleared.";
-        return RedirectToPage(); // Refresh the page
+        return RedirectToPage(); 
     }
     
+    public async Task<IActionResult> OnPostUnlockUserAsync(string userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            TempData["Error"] = "User not found.";
+            return RedirectToPage();
+        }
+
+        await _userManager.SetLockoutEndDateAsync(user, null); // Remove lockout
+        TempData["Message"] = $"User {user.Email} has been unlocked.";
+        return RedirectToPage();
+    }
+
 }
