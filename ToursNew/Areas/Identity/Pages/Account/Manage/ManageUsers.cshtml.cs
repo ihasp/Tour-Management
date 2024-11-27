@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -158,5 +158,4 @@ public class ManageUsersModel : PageModel
         TempData["Message"] = "All logs have been cleared.";
         return RedirectToPage(); // Refresh the page
     }
-    
 }
