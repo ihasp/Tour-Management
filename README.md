@@ -10,5 +10,5 @@ It’s built using .NET Core 8
 - **Tour Creation**: Create new tours with details such as destination, duration, itinerary, and cost.
 - **Booking Management**: Manage bookings for tours, including adding, editing, and cancelling bookings.
 - **Customer Management**: Maintain a database of customers, their details, preferences, and booking history.
-
+- **User Management**: Add, Remove, manage users and monitor their behavior via Admin Panel menu
 
