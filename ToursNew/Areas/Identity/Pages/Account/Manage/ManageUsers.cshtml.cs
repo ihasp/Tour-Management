@@ -72,7 +72,16 @@ public class ManageUsersModel : PageModel
     public List<ActivityLogs> ActivityLogs { get; set; }
     public async Task OnGetAsync()
     {
-        Users = _userManager.Users.ToList();
+        Users = await _userManager.Users
+            .Select(user => new IdentityUser
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                Email = user.Email,
+                EmailConfirmed = user.EmailConfirmed // Include the EmailConfirmed property
+            })
+            .ToListAsync();
+        
         ActivityLogs = await _context.ActivityLogs
             .OrderByDescending(log => log.Timestamp)
             .ToListAsync();
@@ -86,14 +95,27 @@ public class ManageUsersModel : PageModel
             _logger.LogError("Model state invalid");
         }
 
-        var user = new IdentityUser {UserName = InputUserModel.Email, Email = InputUserModel.Email};
+        var user = new IdentityUser { UserName = InputUserModel.Email, Email = InputUserModel.Email };
         try
         {
             var result = await _userManager.CreateAsync(user, InputUserModel.Password);
 
             if (result.Succeeded)
             {
-                TempData["Message"] = "New user added successfully.";
+                // Automatically confirm the user's email
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var confirmResult = await _userManager.ConfirmEmailAsync(user, token);
+
+                if (confirmResult.Succeeded)
+                {
+                    TempData["Message"] = "New user added successfully, and email confirmed.";
+                }
+                else
+                {
+                    _logger.LogError("Email confirmation failed: {Errors}",
+                        string.Join(", ", confirmResult.Errors.Select(e => e.Description)));
+                    TempData["Error"] = "User created, but email confirmation failed.";
+                }
             }
             else
             {
@@ -107,9 +129,10 @@ public class ManageUsersModel : PageModel
             _logger.LogError("Error during user creation: {Error}", ex.Message);
             TempData["Error"] = "An unexpected error occurred while creating the user.";
         }
-        
+    
         return RedirectToPage();
     }
+
 
     public async Task<IActionResult> OnPostUpdateUserAsync()
     {
