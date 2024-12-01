@@ -78,6 +78,7 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
             <thead>
             <tr>
                 <th>Email</th>
+                <th>Email Confirmed</th>
                 <th>Lockout Status</th>
                 <th>Unlock</th>
             </tr>
@@ -87,6 +88,9 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
             {
                 <tr>
                     <td>@user.Email</td>
+                    <td>
+                        @(user.EmailConfirmed ? "Yes" : "No")
+                    </td>
                     <td>
                         @(user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.Now
                             ? $"Locked until {user.LockoutEnd.Value.LocalDateTime}"
