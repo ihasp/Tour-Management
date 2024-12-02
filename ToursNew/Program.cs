@@ -27,13 +27,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
     .AddDefaultTokenProviders()
     .AddDefaultUI();
 
-//logging part
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
 builder.Services.AddControllersWithViews();
 
 //repos
@@ -58,6 +52,11 @@ builder.Services.AddScoped<IValidator<Client>, ClientValidator>();
 builder.Services.AddScoped<IValidator<Reservation>, ReservationValidator>();
 
 builder.Services.AddScoped<IValidator<Trip>, TripValidator>();
+
+//logging part
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
 
 //activity logger
 builder.Services.AddScoped<IActivityLogger, ActivityLogger>();
@@ -115,16 +114,11 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
 app.MapRazorPages();
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
-
 app.MapControllerRoute(
     "default",
     "{controller=Home}/{action=Index}/{id?}");
