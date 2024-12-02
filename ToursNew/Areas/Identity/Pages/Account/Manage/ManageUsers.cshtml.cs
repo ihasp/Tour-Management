@@ -24,7 +24,6 @@ public class ManageUsersModel : PageModel
         _logger = logger;
         _context = context;
     }
-
     
     [BindProperty]
     public List<IdentityUser> Users { get; set; }
@@ -132,8 +131,7 @@ public class ManageUsersModel : PageModel
     
         return RedirectToPage();
     }
-
-
+    
     public async Task<IActionResult> OnPostUpdateUserAsync()
     {
         var user = await _userManager.FindByIdAsync(EditUser.UserId);

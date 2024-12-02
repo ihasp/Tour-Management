@@ -23,6 +23,11 @@
                     <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password"/>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
+                    <div class="form-floating mb-3">
+                        <label>One-time password</label>
+                        <input class="form-control" autocomplete="otp" aria-required="true" placeholder="Single-use password"/>
+                        <span class="text-danger"></span>
+                    </div>
                 <div class="checkbox mb-3 ml-3">
                     <label asp-for="Input.RememberMe" class="form-label">
                         <input class="form-check-input" asp-for="Input.RememberMe"/>
