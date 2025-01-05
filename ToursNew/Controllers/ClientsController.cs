@@ -1,8 +1,11 @@
-﻿using AutoMapper;
+﻿using System.Text;
+using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ToursNew.Areas.Identity.Pages.Account.Manage;
+using ToursNew.Data;
 using ToursNew.Models;
 using ToursNew.Services;
 using ToursNew.ViewModels;
@@ -15,17 +18,22 @@ public class ClientsController : Controller
     private readonly IClientService _clientService;
     private readonly IMapper _mapper;
     private readonly IValidator<Client> _validator;
+    private readonly ToursContext _context;
 
-    public ClientsController(IClientService clientService, IMapper mapper, IValidator<Client> validator)
+    public ClientsController(IClientService clientService, IMapper mapper, IValidator<Client> validator, ToursContext context)
     {
         _clientService = clientService;
         _mapper = mapper;
         _validator = validator;
+        _context = context;
     }
+    
+    public string LicenseState { get; private set; }
 
     // GET: Clients
     public async Task<IActionResult> Index()
     {
+        LicenseState = LicenseModel.GetLicenseState();
         var clients = await _clientService.GetAllClientsAsync();
         var clientViewModels = _mapper.Map<IEnumerable<ClientViewModel>>(clients);
         return View(clientViewModels);
@@ -157,5 +165,32 @@ public class ClientsController : Controller
     private bool ClientExists(int id)
     {
         return _clientService.GetClientsByIdAsync(id) != null;
+    }
+    
+    //export to csv
+    [HttpGet]
+    public IActionResult ExportToFile()
+    {
+        var clients = _context.Clients
+            .Select(c => new ClientViewModel
+            {
+                Name = c.Name,
+                LastName = c.LastName,
+                Email = c.Email,
+                Phone = c.Phone,
+                Adult = c.Adult
+            }).ToList();
+
+        var csv = new StringBuilder();
+        csv.AppendLine("Name,LastName,Email,Phone,Adult");
+
+        foreach (var client in clients)
+        {
+            csv.AppendLine($"{client.Name},{client.LastName},{client.Email},{client.Phone},{client.Adult}");
+        }
+
+        var fileName = "Clients.csv";
+        var fileBytes = Encoding.UTF8.GetBytes(csv.ToString());
+        return File(fileBytes, "text/csv", fileName);
     }
 }

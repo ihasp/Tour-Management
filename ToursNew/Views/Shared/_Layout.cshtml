@@ -25,6 +25,14 @@
     <link href="css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 
+<script>
+    var session = 60 * 20000
+    setTimeout(function (){
+        alert('Your session has expired')
+        window.location.href='../Areas/Identity/Account/Login'
+    }, session);
+</script>
+
 <style>
     #content {
         min-height: 100vh;

@@ -14,7 +14,6 @@ public class ToursContext : IdentityDbContext
     public DbSet<Trip> Trips { get; set; }
     public DbSet<Reservation> Reservations { get; set; }
     public DbSet<ActivityLogs> ActivityLogs { get; set; } 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
