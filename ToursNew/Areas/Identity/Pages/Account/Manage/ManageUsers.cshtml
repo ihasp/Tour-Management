@@ -14,7 +14,9 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
 <div class="alert alert-danger">@TempData["Error"]</div>
 }
 
-<div class="mb-5">
+@if (Model.LicenseState == "Licensed")
+{
+    <div class="mb-5">
     <h3>Add New User</h3>
 
     <form method="post" asp-page-handler="AddUser" role="alert">
@@ -37,7 +39,14 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
             <span asp-validation-for="InputUserModel.ConfirmPassword" class="text-danger"></span>
         </div>
         
-        <!-- add generate otp checkbox -->
+        <div class="form-group">
+            <div class="form-group">
+            <label asp-for="InputUserModel.CheckboxOTP"></label>
+            <input type="checkbox" asp-for="InputUserModel.CheckboxOTP" class="p-4"></input>
+            </div>
+            <label asp-for="InputUserModel.PasswordExpiration"></label>
+            <input asp-for="InputUserModel.PasswordExpiration" class="form-control" ></input>
+        </div>
         
         <button type="submit" class="btn btn-primary">Create User</button> <br/>
     </form>
@@ -48,7 +57,6 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
 <table class="table table-striped table-hover table-responsive-md">
     <thead>
     <tr>
-        <th>Username</th>
         <th>Email</th>
         <th>Update Username/Email</th>
     </tr>
@@ -56,19 +64,22 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
     <tbody>
     @foreach (var user in Model.Users)
     {
+        if (user.UserName == "admin@gmail.com")
+        {
+            continue;
+        }
         <tr>
-            <td>@user.UserName</td>
             <td>@user.Email</td>
             <td>
                 <form method="post" asp-page-handler="UpdateUser" class="form-inline" style="display: inline-block;">
                     <input type="hidden" asp-for="EditUser.UserId" value="@user.Id" />
                     <input asp-for="EditUser.Username" value="@user.UserName" class="form-control mr-2" placeholder="Username" />
                     <input asp-for="EditUser.Email" value="@user.Email" class="form-control mr-2" placeholder="Email" />
-                    <button type="submit" class="btn btn-primary mr-2">Update</button>
+                    <button type="submit" class="btn btn-primary ml-5">Update</button>
                 </form>
                 <form method="post" asp-page-handler="DeleteUser" style="display:inline;">
                     <input type="hidden" name="userId" value="@user.Id" />
-                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                    <button type="submit" class="btn btn-danger ml-2" onclick="return confirm('Are you sure?')">Delete</button>
                 </form>
             </td>
         </tr>
@@ -99,7 +110,7 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
                             : "Not Locked")
                     </td>
                     <td>
-                        @if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.Now)
+                        @if (user.LockoutEnd.HasValue)
                         {
                             <form method="post" asp-page-handler="UnlockUser">
                                 <input type="hidden" name="userId" value="@user.Id" />
@@ -153,3 +164,12 @@ ViewData["ActivePage"] = ManageNavPages.AdminPanel;
     </div>
     
 </div>
+} else
+{
+    <div class="alert alert-danger">
+        <h3>License inactive or expired</h3>
+        <p>Your license has expired or you don't have active license check license settings for more information.</p>
+    </div>
+}
+
+

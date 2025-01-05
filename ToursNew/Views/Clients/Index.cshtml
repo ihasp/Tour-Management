@@ -1,14 +1,21 @@
-﻿@model IEnumerable<ToursNew.ViewModels.ClientViewModel>
+﻿@using ToursNew.Areas.Identity.Pages.Account.Manage
+@model IEnumerable<ToursNew.ViewModels.ClientViewModel>
 @{
     ViewData["Title"] = "Index";
 }
+
 <div class="min-vh-100">
     <h1>Klienci</h1>
 
     <p>
         <a class="btn btn-outline-success" asp-action="Create">Dodaj</a>
     </p>
-
+    @if (LicenseModel.GetLicenseState()=="Licensed")
+    {
+        <p>
+            <a class="btn btn-outline-success" asp-action="ExportToFile">Exportuj do pliku</a>
+        </p>
+    }
     <div class="card mb-2">
         <div class="card align-self-auto align-content-center m-2">
             <form asp-controller="Clients" asp-action="Sort" method="get" class="form-inline">

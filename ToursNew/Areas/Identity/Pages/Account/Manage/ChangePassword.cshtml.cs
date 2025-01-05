@@ -15,6 +15,7 @@ namespace ToursNew.Areas.Identity.Pages.Account.Manage
 {
     public class ChangePasswordModel : PageModel
     {
+        private readonly IConfiguration _configuration;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
         private readonly ILogger<ChangePasswordModel> _logger;
@@ -24,47 +25,30 @@ namespace ToursNew.Areas.Identity.Pages.Account.Manage
             UserManager<IdentityUser> userManager,
             SignInManager<IdentityUser> signInManager,
             ILogger<ChangePasswordModel> logger,
-            IActivityLogger activityLogger)
+            IActivityLogger activityLogger,
+            IConfiguration configuration)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _activityLogger = activityLogger;
+            _configuration = configuration;
         }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         [BindProperty]
         public InputModel Input { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         [TempData]
         public string StatusMessage { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+
             [Required]
             [DataType(DataType.Password)]
             [Display(Name = "Current password")]
             public string OldPassword { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            
             [Required]
             [RegularExpression("^(?=.{6,32}$)(?=.*[A-Z])(?=.*[a-z])(?!.*(.)\\1).+$",
                 ErrorMessage = "Hasło musi mieć conajmniej 6 znaków i nie mogą się powtarzać, posiadać conajmniej jedną dużą literę, oraz nie może być puste")]
@@ -72,11 +56,6 @@ namespace ToursNew.Areas.Identity.Pages.Account.Manage
             [DataType(DataType.Password)]
             [Display(Name = "New password")]
             public string NewPassword { get; set; }
-
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             
             [DataType(DataType.Password)]
             [Display(Name = "Confirm new password")]
@@ -107,7 +86,22 @@ namespace ToursNew.Areas.Identity.Pages.Account.Manage
             {
                 return Page();
             }
+            
+            //recaptcha check
+            string googleRecaptchaToken = Request.Form["g-recaptcha-response"].ToString();
+            string secretKey = _configuration["ReCaptchaSettings:SecretKey"];
+            string verificationUrl = _configuration["ReCaptchaSettings:VerificationUrl"];
+            
+            bool isValid = await ReCaptchaService.verifyReCaptchav3(googleRecaptchaToken, secretKey, verificationUrl);
 
+            if (!isValid)
+            { 
+                await _activityLogger.LogAsync("Password change", User.Identity.Name, "Invalid ReCaptchav3 token");
+                TempData["Error"] = "Invalid Recaptcha";
+                return RedirectToPage("./Index");
+            }
+            
+            
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -126,9 +120,7 @@ namespace ToursNew.Areas.Identity.Pages.Account.Manage
 
             await _signInManager.RefreshSignInAsync(user);
             await _activityLogger.LogAsync("Password change", User.Identity.Name, "User changed their password");
-            _logger.LogInformation("User changed their password successfully.");
-            StatusMessage = "Your password has been changed.";
-            
+            TempData["Message"] = "Your password has been changed.";
             return RedirectToPage();
         }
     }

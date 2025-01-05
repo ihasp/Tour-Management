@@ -1,0 +1,31 @@
+﻿@page
+@model LicenseModel
+@{
+    ViewData["Title"] = "Licensing";
+    ViewData["ActivePage"] = ManageNavPages.LicensePage;
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="mb-5">
+    <h3>Current License State: <span class="text-primary">@Model.LicenseState</span></h3>
+    <form method="post">
+        <div class="form-group">
+           @if (@Model.LicenseState != "Licensed")
+            {
+                <p>You can activate the full version of the program by using the license here:</p>
+                <label asp-for="InputModel.license"></label>
+                <input asp-for="InputModel.license" class="form-control"/>
+                <span asp-validation-for="InputModel.license" class="text-danger"></span>
+                <button type="submit" class="btn-lg btn-primary w-100 mt-2">Update License</button>
+            }
+        </div>
+    </form>
+</div>

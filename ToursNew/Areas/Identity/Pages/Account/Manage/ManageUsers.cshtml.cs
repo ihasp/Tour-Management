@@ -1,11 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
-using NuGet.Protocol.Core.Types;
 using ToursNew.Data;
 using ToursNew.Models;
 
@@ -33,6 +31,8 @@ public class ManageUsersModel : PageModel
 
     [BindProperty]
     public UpdateUserInputModel EditUser { get; set; }
+    
+    public string LicenseState { get; private set; }
         
     public class AddUserInputModel
     {
@@ -52,6 +52,11 @@ public class ManageUsersModel : PageModel
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "Hasła nie pasują do siebie")]
         public string ConfirmPassword { get; set; }
+        
+        [Display(Name = "One time password")]
+        public bool CheckboxOTP { get; set; }
+        [Display(Name = "Set password expiration in seconds")]
+        public int PasswordExpiration { get; set; }
     }
 
     public class UpdateUserInputModel
@@ -71,13 +76,14 @@ public class ManageUsersModel : PageModel
     public List<ActivityLogs> ActivityLogs { get; set; }
     public async Task OnGetAsync()
     {
+        LicenseState = LicenseModel.GetLicenseState();
         Users = await _userManager.Users
             .Select(user => new IdentityUser
             {
                 Id = user.Id,
                 UserName = user.UserName,
                 Email = user.Email,
-                EmailConfirmed = user.EmailConfirmed // Include the EmailConfirmed property
+                EmailConfirmed = user.EmailConfirmed
             })
             .ToListAsync();
         
@@ -86,52 +92,60 @@ public class ManageUsersModel : PageModel
             .ToListAsync();
     }
 
-    public async Task<IActionResult> OnPostAddUserAsync()
+public async Task<IActionResult> OnPostAddUserAsync()
+{
+    if (!ModelState.IsValid)
     {
-        _logger.LogInformation("Adding user");
-        if (!ModelState.IsValid)
-        {
-            _logger.LogError("Model state invalid");
-        }
+        _logger.LogError("Model state invalid");
+    }
 
-        var user = new IdentityUser { UserName = InputUserModel.Email, Email = InputUserModel.Email };
-        try
-        {
-            var result = await _userManager.CreateAsync(user, InputUserModel.Password);
+    string password = InputUserModel.CheckboxOTP ? GenerateOTP() : InputUserModel.Password;
 
-            if (result.Succeeded)
+    var user = new IdentityUser { UserName = InputUserModel.Email, Email = InputUserModel.Email };
+    try
+    {
+        var result = await _userManager.CreateAsync(user, password);
+
+        if (result.Succeeded)
+        {
+            if (InputUserModel.CheckboxOTP)
             {
-                // Automatically confirm the user's email
-                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                var confirmResult = await _userManager.ConfirmEmailAsync(user, token);
-
-                if (confirmResult.Succeeded)
-                {
-                    TempData["Message"] = "New user added successfully, and email confirmed.";
-                }
-                else
-                {
-                    _logger.LogError("Email confirmation failed: {Errors}",
-                        string.Join(", ", confirmResult.Errors.Select(e => e.Description)));
-                    TempData["Error"] = "User created, but email confirmation failed.";
-                }
+                var otpClaim = new Claim("OTP", password); 
+                await _userManager.AddClaimAsync(user, otpClaim);
+                TempData["Message"] = $"New user added successfully. OTP generated: {password}";
             }
             else
             {
-                _logger.LogError("User creation failed: {Errors}",
-                    string.Join(", ", result.Errors.Select(e => e.Description)));
-                TempData["Error"] = string.Join(", ", result.Errors.Select(e => e.Description));
+                TempData["Message"] = "New user added successfully.";
+            }
+            
+            // Automatically confirm the user's email
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmResult = await _userManager.ConfirmEmailAsync(user, token);
+
+            if (!confirmResult.Succeeded)
+            {
+                _logger.LogError("Email confirmation failed: {Errors}",
+                    string.Join(", ", confirmResult.Errors.Select(e => e.Description)));
+                TempData["Error"] = "User created, but email confirmation failed.";
             }
         }
-        catch (Exception ex)
+        else
         {
-            _logger.LogError("Error during user creation: {Error}", ex.Message);
-            TempData["Error"] = "An unexpected error occurred while creating the user.";
+            _logger.LogError("User creation failed: {Errors}",
+                string.Join(", ", result.Errors.Select(e => e.Description)));
+            TempData["Error"] = string.Join(", ", result.Errors.Select(e => e.Description));
         }
-    
-        return RedirectToPage();
     }
-    
+    catch (Exception ex)
+    {
+        _logger.LogError("Error during user creation: {Error}", ex.Message);
+        TempData["Error"] = "An unexpected error occurred while creating the user.";
+    }
+
+    return RedirectToPage();
+}
+
     public async Task<IActionResult> OnPostUpdateUserAsync()
     {
         var user = await _userManager.FindByIdAsync(EditUser.UserId);
@@ -156,7 +170,14 @@ public class ManageUsersModel : PageModel
     public async Task<IActionResult> OnPostDeleteUserAsync(string userId)
     {
         var user = await _userManager.FindByIdAsync(userId);
+        var useradmin = await _userManager.FindByEmailAsync(user.Email);
+
         if (user == null) return NotFound();
+        if (useradmin.Email.Equals("admin@gmail.com"))
+        {
+            TempData["Error"] = "You cannot delete your administrator account.";
+            return RedirectToPage();
+        }
 
         var result = await _userManager.DeleteAsync(user);
         if (result.Succeeded)
@@ -188,9 +209,22 @@ public class ManageUsersModel : PageModel
             return RedirectToPage();
         }
 
-        await _userManager.SetLockoutEndDateAsync(user, null); // Remove lockout
+        if (!user.LockoutEnabled)
+        {
+            TempData["Error"] = "User is not locked";
+        }
+        await _userManager.SetLockoutEndDateAsync(user, null); // Remove lockoust
         TempData["Message"] = $"User {user.Email} has been unlocked.";
         return RedirectToPage();
     }
-
+    
+    private string GenerateOTP()
+    {
+        Random random = new Random();
+        var x = random.Next(1, 101);
+        int a = 15;
+        var result = a * Math.Sin(x);
+        int formattedResult = Math.Abs((int)result);
+        return formattedResult.ToString("D7");
+    }
 }
