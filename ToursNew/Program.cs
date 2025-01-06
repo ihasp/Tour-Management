@@ -1,7 +1,6 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using ToursNew.Data;
 using ToursNew.Models;
 using ToursNew.Repository;
@@ -89,7 +88,7 @@ using (var scope = app.Services.CreateScope())
         var usermanager = "manager@gmail.com";
         var userdefault = "user@gmail.com";
         var usertester = "tester@gmail.com";
-            
+
         var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
         var user = await userManager.FindByEmailAsync(useradmin);
@@ -103,9 +102,9 @@ using (var scope = app.Services.CreateScope())
         user = await userManager.FindByEmailAsync(userdefault);
         if (user != null && !await userManager.IsInRoleAsync(user, "User"))
             await userManager.AddToRoleAsync(user, "User");
-        
+
         user = await userManager.FindByEmailAsync(usertester);
-        if(user != null && !await userManager.IsInRoleAsync(user, "Tester"))
+        if (user != null && !await userManager.IsInRoleAsync(user, "Tester"))
             await userManager.AddToRoleAsync(user, "Tester");
     }
     catch (Exception ex)

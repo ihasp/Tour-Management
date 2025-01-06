@@ -23,29 +23,31 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-floating mb-3">
                     <label asp-for="Input.Email" class="form-label">Email</label>
-                    <input asp-for="Input.Email" class="form-control" 
+                    <input asp-for="Input.Email" class="form-control"
                            autocomplete="username" aria-required="true" placeholder="name@example.com"/>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3">
                     <label asp-for="Input.Password" class="form-label">Password or OTP</label>
-                    <input asp-for="Input.Password" class="form-control" 
+                    <input asp-for="Input.Password" class="form-control"
                            autocomplete="current-password" aria-required="true" placeholder="password"/>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
                 <br/>
                 <div class="form-floating mb-3">
                     <label asp-for="Input.Captcha" class="form-label"><img src="@Url.Content("~/cap2.jpg")"/></label>
-                    <input asp-for="Input.Captcha" class="form-control" aria-required="true" placeholder="Wynik/Result"></input>
+                    <input asp-for="Input.Captcha" class="form-control" aria-required="true"
+                           placeholder="Wynik/Result"></input>
                     <span asp-validation-for="Input.Captcha" class="text-danger"></span>
                 </div>
                 
+
                 @* <div class="form-floating mb-3"> *@
                 @*     <label>One-time password</label> *@
                 @*     <input class="form-control" autocomplete="otp" aria-required="true" placeholder="Single-use password"/> *@
                 @*     <input class="form-control" disabled placeholder="a = 15"/> *@
                 @* </div> *@
-                
+
                 <div class="checkbox mb-3 ml-3">
                     <label asp-for="Input.RememberMe" class="form-label">
                         <input class="form-check-input" asp-for="Input.RememberMe"/>
@@ -58,7 +60,7 @@
                 <div class="mt-4">
                     <p>
                         <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>    
+                    </p>
                     <p>
                         <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
                     </p>

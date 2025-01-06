@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Nodes;
-using Microsoft.DotNet.MSIdentity.Shared;
 
 namespace ToursNew.Services;
 
@@ -12,7 +11,7 @@ public class ReCaptchaService
             var content = new MultipartFormDataContent();
             content.Add(new StringContent(response), "response");
             content.Add(new StringContent(secret), "secret");
-            
+
             var result = await client.PostAsync(verificationUrl, content);
 
             if (result.IsSuccessStatusCode)

@@ -70,7 +70,8 @@ public class TripsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] TripViewModel tripViewModel)
+        [Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")]
+        TripViewModel tripViewModel)
     {
         if (ModelState.IsValid)
         {
@@ -105,7 +106,8 @@ public class TripsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id,
-        [Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")] TripViewModel tripViewModel)
+        [Bind("IDTrip,Destination,FromWhere,DepartureDate,ReturnDate,Price,Description")]
+        TripViewModel tripViewModel)
     {
         if (id != tripViewModel.IDTrip) return NotFound();
 
