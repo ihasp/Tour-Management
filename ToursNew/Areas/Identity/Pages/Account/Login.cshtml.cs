@@ -14,42 +14,48 @@ namespace ToursNew.Areas.Identity.Pages.Account;
 
 public class LoginModel : PageModel
 {
+    private readonly IActivityLogger _activityLogger;
+    private readonly HttpClient _httpClient;
     private readonly ILogger<LoginModel> _logger;
     private readonly SignInManager<IdentityUser> _signInManager;
-    private readonly IActivityLogger _activityLogger;
+    private readonly UserManager<IdentityUser> _userManager;
 
-    public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger, IActivityLogger activityLogger)
+    public LoginModel(SignInManager<IdentityUser> signInManager, ILogger<LoginModel> logger,
+        IActivityLogger activityLogger, UserManager<IdentityUser> userManager, HttpClient httpClient)
     {
         _signInManager = signInManager;
         _logger = logger;
         _activityLogger = activityLogger;
+        _userManager = userManager;
+        _httpClient = httpClient;
     }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
-    [BindProperty]
-    public InputModel Input { get; set; }
+    [BindProperty] public InputModel Input { get; set; }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
     public string ReturnUrl { get; set; }
 
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
-    [TempData]
-    public string ErrorMessage { get; set; }
+    [TempData] public string ErrorMessage { get; set; }
+
+    public async Task TriggerHoneyTokenAsync()
+    {
+        try
+        {
+            var canaryTokenURL = "";
+            var response = await _httpClient.GetAsync(canaryTokenURL);
+            if (response.IsSuccessStatusCode)
+                await _activityLogger.LogAsync("HoneyToken", User.Identity.Name, "Honey token triggered");
+            else
+                await _activityLogger.LogAsync("HoneyToken", User.Identity.Name,
+                    "Honey token triggered but response wasn't successful");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error during honey token trigger: {ex.Message}");
+            TempData["Error"] = $"Error during honey token trigger {ex.Message}";
+        }
+    }
 
     public async Task OnGetAsync(string returnUrl = null)
     {
@@ -57,9 +63,7 @@ public class LoginModel : PageModel
 
         returnUrl ??= Url.Content("~/");
 
-        // Clear the existing external cookie to ensure a clean login process
         await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
         ReturnUrl = returnUrl;
@@ -71,64 +75,95 @@ public class LoginModel : PageModel
 
         ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
-        if (ModelState.IsValid)
+        if (!Input.Captcha.Equals("7"))
         {
-            // This doesn't count login failures towards account lockout
-            // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-            var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, false);
-            if (result.Succeeded)
-            {
-                await _activityLogger.LogAsync("Login", User.Identity.Name, $"User logged in.");
-                return LocalRedirect(returnUrl);
-            }
-            else
-            {
-                await _activityLogger.LogAsync("Failed Login", $"{Input.Email}", $"Failed login attempt for the user");
-            }
-
-            if (result.RequiresTwoFactor)
-                return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, Input.RememberMe });
-            if (result.IsLockedOut)
-            {
-                _logger.LogWarning("User account locked out.");
-                return RedirectToPage("./Lockout");
-            }
-
-            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            ModelState.AddModelError(string.Empty, "Invalid value in captcha field");
             return Page();
         }
 
-        // If we got this far, something failed, redisplay form
+        if (ModelState.IsValid)
+        {
+            var user = await _userManager.FindByEmailAsync(Input.Email);
+            if (user == null)
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                return Page();
+            }
+
+
+            // Check if the user is locked out first
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                var lockoutEnd = await _userManager.GetLockoutEndDateAsync(user);
+                if (lockoutEnd.HasValue && lockoutEnd > DateTimeOffset.Now)
+                {
+                    var minutesRemaining = (lockoutEnd.Value - DateTimeOffset.Now).Minutes;
+                    ModelState.AddModelError(string.Empty,
+                        $"Your account is locked. Try again in {minutesRemaining} minutes.");
+
+                    return Page();
+                }
+
+                await _userManager.SetLockoutEndDateAsync(user, null);
+            }
+
+            // Check for OTP if required
+            var otpClaim = (await _userManager.GetClaimsAsync(user))
+                .FirstOrDefault(c => c.Type == "OTP");
+
+            if (otpClaim != null && !string.IsNullOrEmpty(Input.OTP))
+                if (Input.OTP != otpClaim.Value)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid OTP.");
+                    return Page();
+                }
+
+            // Sign in with password and handle lockout on failure
+            var signInResult = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password,
+                Input.RememberMe, true);
+
+            if (signInResult.Succeeded)
+            {
+                await _activityLogger.LogAsync("Login", User.Identity.Name, "user logged in.");
+                if (Input.Email.Equals("canarytoken@gmail.com")) await TriggerHoneyTokenAsync();
+                return LocalRedirect(returnUrl);
+            }
+
+            if (signInResult.IsLockedOut)
+            {
+                ModelState.AddModelError(string.Empty, "Your account is locked. Please try again later.");
+                _logger.LogWarning("User account locked out.");
+                return Page();
+            }
+
+            if (signInResult.RequiresTwoFactor)
+                return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, Input.RememberMe });
+
+            await _activityLogger.LogAsync("Failed Login", $"{Input.Email}", "Failed login attempt.");
+            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            return Page();
+        }
         return Page();
     }
-
-    /// <summary>
-    ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
+    
     public class InputModel
     {
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Required] [EmailAddress] public string Email { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
+        [Display(Name = "Remember me?")] public bool RememberMe { get; set; }
+
+        [Required]
+        [Display(Name = "S-Captcha")]
+        [DataType(DataType.Text)]
+        public string Captcha { get; set; }
+
+        [Display(Name = "One-time password")]
+        [DataType(DataType.Text)]
+
+        public string OTP { get; set; }
     }
 }

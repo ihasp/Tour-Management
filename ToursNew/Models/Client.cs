@@ -8,6 +8,7 @@ public class Client
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int IDClient { get; set; }
+
     public string Name { get; set; }
     public string LastName { get; set; }
     public string Email { get; set; }
