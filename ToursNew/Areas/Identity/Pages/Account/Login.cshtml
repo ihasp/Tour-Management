@@ -1,6 +1,14 @@
 ﻿@page
 @model LoginModel
 
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
 @{
     ViewData["Title"] = "Log in";
 }
@@ -15,14 +23,31 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
                 <div class="form-floating mb-3">
                     <label asp-for="Input.Email" class="form-label">Email</label>
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                    <input asp-for="Input.Email" class="form-control"
+                           autocomplete="username" aria-required="true" placeholder="name@example.com"/>
                     <span asp-validation-for="Input.Email" class="text-danger"></span>
                 </div>
                 <div class="form-floating mb-3">
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password"/>
+                    <label asp-for="Input.Password" class="form-label">Password or OTP</label>
+                    <input asp-for="Input.Password" class="form-control"
+                           autocomplete="current-password" aria-required="true" placeholder="password"/>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
+                <br/>
+                <div class="form-floating mb-3">
+                    <label asp-for="Input.Captcha" class="form-label"><img src="@Url.Content("~/cap2.jpg")"/></label>
+                    <input asp-for="Input.Captcha" class="form-control" aria-required="true"
+                           placeholder="Wynik/Result"></input>
+                    <span asp-validation-for="Input.Captcha" class="text-danger"></span>
+                </div>
+                
+
+                @* <div class="form-floating mb-3"> *@
+                @*     <label>One-time password</label> *@
+                @*     <input class="form-control" autocomplete="otp" aria-required="true" placeholder="Single-use password"/> *@
+                @*     <input class="form-control" disabled placeholder="a = 15"/> *@
+                @* </div> *@
+
                 <div class="checkbox mb-3 ml-3">
                     <label asp-for="Input.RememberMe" class="form-label">
                         <input class="form-check-input" asp-for="Input.RememberMe"/>
@@ -35,7 +60,7 @@
                 <div class="mt-4">
                     <p>
                         <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>    
+                    </p>
                     <p>
                         <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
                     </p>
@@ -46,39 +71,6 @@
             </form>
         </section>
     </div>
-    @* <div class="col-md-6 col-md-offset-2"> *@
-    @*     <section> *@
-    @*         <h3>Use another service to log in.</h3> *@
-    @*         <hr/> *@
-    @*         @{ *@
-    @*             if ((Model.ExternalLogins?.Count ?? 0) == 0) *@
-    @*             { *@
-    @*                 <div> *@
-    @*                     <p> *@
-    @*                         There are no external authentication services configured. See this *@
-    @*                         <a href="https://go.microsoft.com/fwlink/?LinkID=532715"> *@
-    @*                             article *@
-    @*                             about setting up this ASP.NET application to support logging in via external services *@
-    @*                         </a>. *@
-    @*                     </p> *@
-    @*                 </div> *@
-    @*             } *@
-    @*             else *@
-    @*             { *@
-    @*                 <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal"> *@
-    @*                     <div> *@
-    @*                         <p> *@
-    @*                             @foreach (var provider in Model.ExternalLogins!) *@
-    @*                             { *@
-    @*                                 <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button> *@
-    @*                             } *@
-    @*                         </p> *@
-    @*                     </div> *@
-    @*                 </form> *@
-    @*             } *@
-    @*         } *@
-    @*     </section> *@
-    @* </div> *@
 </div>
 
 @section Scripts {

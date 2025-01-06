@@ -1,7 +1,4 @@
-﻿using ToursNew.Models;
-
-namespace ToursNew.Services;
-
+﻿namespace ToursNew.Services;
 
 public interface IActivityLogger
 {

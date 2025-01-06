@@ -149,7 +149,8 @@ public class RegisterModel : PageModel
         /// </summary>
         [Required]
         [RegularExpression("^(?=.{6,32}$)(?=.*[A-Z])(?=.*[a-z])(?!.*(.)\\1).+$",
-            ErrorMessage = "Hasło musi mieć conajmniej 6 znaków i nie mogą się powtarzać")]
+            ErrorMessage =
+                "Hasło musi mieć conajmniej 6 znaków i nie mogą się powtarzać, posiadać conajmniej jedną dużą literę, oraz nie może być puste")]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.",
             MinimumLength = 6)]
         [DataType(DataType.Password)]
