@@ -1,6 +1,4 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using Microsoft.Identity.Client
-@using ToursNew.Areas.Identity.Pages.Account
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @{
@@ -27,9 +25,9 @@
 
 <script>
     var session = 60 * 20000
-    setTimeout(function (){
+    setTimeout(function () {
         alert('Your session has expired')
-        window.location.href='../Areas/Identity/Account/Login'
+        window.location.href = '../Areas/Identity/Account/Login'
     }, session);
 </script>
 
@@ -37,7 +35,7 @@
     #content {
         min-height: 100vh;
     }
-    </style>
+</style>
 <body id="page-top">
 
 <!-- Page Wrapper -->
@@ -59,18 +57,18 @@
 
         <!-- Nav Item - Pages Collapse Menu -->
         <li class="nav-item">
-        <a class="nav-link" asp-area="" asp-controller="Clients" asp-action="Index">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Klienci</span>
-        </a>
-        <a class="nav-link" asp-area="" asp-controller="Trips" asp-action="Index">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Wycieczki</span>
-        </a>
-        <a class="nav-link" asp-area="" asp-controller="Reservations" asp-action="Index">
-            <i class="fas fa-fw fa-table"></i>
-            <span>Rezerwacje</span>
-        </a>
+            <a class="nav-link" asp-area="" asp-controller="Clients" asp-action="Index">
+                <i class="fas fa-fw fa-table"></i>
+                <span>Klienci</span>
+            </a>
+            <a class="nav-link" asp-area="" asp-controller="Trips" asp-action="Index">
+                <i class="fas fa-fw fa-table"></i>
+                <span>Wycieczki</span>
+            </a>
+            <a class="nav-link" asp-area="" asp-controller="Reservations" asp-action="Index">
+                <i class="fas fa-fw fa-table"></i>
+                <span>Rezerwacje</span>
+            </a>
     </ul>
     <!-- End of Sidebar -->
     <!-- Content Wrapper -->
@@ -97,27 +95,39 @@
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <a class="nav-link dropdown-toggle text-dark small" id="userDropdown" role="button"
-                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="manage" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="manage"
+                               asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
                                 Witaj @UserManager.GetUserName(User)!
                             </a>
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                  aria-labelledby="userDropdown">
                                 @if (User.Identity?.IsAuthenticated ?? false)
                                 {
-                                    <form class="dropdown-item text-dark" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                                        <button type="submit" class="btn btn-transparent p-0 h-25 w-100"><i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Wyloguj</button>
+                                    <form class="dropdown-item text-dark" asp-area="Identity" asp-page="/Account/Logout"
+                                          asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+                                        <button type="submit" class="btn btn-transparent p-0 h-25 w-100"><i
+                                                class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>Wyloguj
+                                        </button>
                                     </form>
                                 }
                                 @if (isAdmin)
                                 {
-                                    <a class="dropdown-item text-dark" id="register" asp-area="Identity" asp-page="/Account/Manage/ManageUsers">
-                                       <button type="button" class="btn btn-transparent p-0 h-25 w-100"><i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>Panel Administratora</button> 
+                                    <a class="dropdown-item text-dark" id="register" asp-area="Identity"
+                                       asp-page="/Account/Manage/ManageUsers">
+                                        <button type="button" class="btn btn-transparent p-0 h-25 w-100"><i
+                                                class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>Panel
+                                            Administratora
+                                        </button>
                                     </a>
                                 }
                                 @if (!isAdmin)
                                 {
-                                    <a class="dropdown-item text-dark" id="register" asp-area="Identity" asp-page="/Account/Manage/ChangePassword">
-                                        <button type="button" class="btn btn-transparent p-0 h-25 w-100"><i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>Ustawienia Konta</button>
+                                    <a class="dropdown-item text-dark" id="register" asp-area="Identity"
+                                       asp-page="/Account/Manage/ChangePassword">
+                                        <button type="button" class="btn btn-transparent p-0 h-25 w-100"><i
+                                                class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>Ustawienia
+                                            Konta
+                                        </button>
                                     </a>
                                 }
                             </div>
@@ -132,11 +142,13 @@
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                  aria-labelledby="userDropdown">
-                                <a class="dropdown-item text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">
+                                <a class="dropdown-item text-dark" id="login" asp-area="Identity"
+                                   asp-page="/Account/Login">
                                     <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>Logowanie
                                 </a>
 
-                                <a class="dropdown-item text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">
+                                <a class="dropdown-item text-dark" id="register" asp-area="Identity"
+                                   asp-page="/Account/Register">
                                     <i class="fas fa-sign-in-alt fa-sm fa-fw mr-2 text-gray-400"></i>Rejestracja
                                 </a>
 

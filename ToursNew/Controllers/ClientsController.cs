@@ -16,18 +16,19 @@ namespace ToursNew.Controllers;
 public class ClientsController : Controller
 {
     private readonly IClientService _clientService;
+    private readonly ToursContext _context;
     private readonly IMapper _mapper;
     private readonly IValidator<Client> _validator;
-    private readonly ToursContext _context;
 
-    public ClientsController(IClientService clientService, IMapper mapper, IValidator<Client> validator, ToursContext context)
+    public ClientsController(IClientService clientService, IMapper mapper, IValidator<Client> validator,
+        ToursContext context)
     {
         _clientService = clientService;
         _mapper = mapper;
         _validator = validator;
         _context = context;
     }
-    
+
     public string LicenseState { get; private set; }
 
     // GET: Clients
@@ -80,7 +81,8 @@ public class ClientsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(
-        [Bind("IDClient,Name,LastName,Email,Phone,Adult")] ClientViewModel clientViewModel)
+        [Bind("IDClient,Name,LastName,Email,Phone,Adult")]
+        ClientViewModel clientViewModel)
     {
         if (ModelState.IsValid)
         {
@@ -115,7 +117,8 @@ public class ClientsController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id,
-        [Bind("IDClient,Name,LastName,Email,Phone,Adult")] ClientViewModel clientViewModel)
+        [Bind("IDClient,Name,LastName,Email,Phone,Adult")]
+        ClientViewModel clientViewModel)
     {
         if (id != clientViewModel.IDClient) return NotFound();
 
@@ -166,7 +169,7 @@ public class ClientsController : Controller
     {
         return _clientService.GetClientsByIdAsync(id) != null;
     }
-    
+
     //export to csv
     [HttpGet]
     public IActionResult ExportToFile()
@@ -185,9 +188,7 @@ public class ClientsController : Controller
         csv.AppendLine("Name,LastName,Email,Phone,Adult");
 
         foreach (var client in clients)
-        {
             csv.AppendLine($"{client.Name},{client.LastName},{client.Email},{client.Phone},{client.Adult}");
-        }
 
         var fileName = "Clients.csv";
         var fileBytes = Encoding.UTF8.GetBytes(csv.ToString());

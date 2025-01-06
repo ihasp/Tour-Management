@@ -18,7 +18,7 @@
     <h3>Current License State: <span class="text-primary">@Model.LicenseState</span></h3>
     <form method="post">
         <div class="form-group">
-           @if (@Model.LicenseState != "Licensed")
+            @if (Model.LicenseState != "Licensed")
             {
                 <p>You can activate the full version of the program by using the license here:</p>
                 <label asp-for="InputModel.license"></label>

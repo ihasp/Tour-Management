@@ -14,7 +14,8 @@
         <div class="card align-self-auto align-content-center m-2">
             <form asp-controller="Reservations" asp-action="Sort" method="get" class="form-inline">
                 <div style="display: flex; width: 100%;">
-                    <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder" style="flex-grow: 1; margin-right: 5px;">
+                    <select placeholder="Wybierz metodę sortowania" class="form-control" id="sortOrder" name="sortOrder"
+                            style="flex-grow: 1; margin-right: 5px;">
                         <option value="Cash">Zapłacone pieniędzmi</option>
                         <option value="Paypal">Zapłacone paypal</option>
                         <option value="Transfer">Zapłacone przelewem</option>
@@ -69,8 +70,9 @@
                 </td>
                 <td class="d-flex justify-content-end">
                     <div class="mx-4">
-                        <a class="btn btn-outline-dark mx-1" asp-action="Edit" asp-route-id="@item.IDReservation">Edytuj</a>
-                        <a class="btn btn-outline-dark mx-1"asp-action="Details" asp-route-id="@item.IDReservation">Szczegóły</a>
+                        <a class="btn btn-outline-dark mx-1" asp-action="Edit"
+                           asp-route-id="@item.IDReservation">Edytuj</a>
+                        <a class="btn btn-outline-dark mx-1" asp-action="Details" asp-route-id="@item.IDReservation">Szczegóły</a>
                         <a class="btn btn-outline-danger mx-1" asp-action="Delete" asp-route-id="@item.IDReservation">Usuń</a>
                     </div>
                 </td>

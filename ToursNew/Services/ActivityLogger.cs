@@ -1,8 +1,7 @@
 ﻿using ToursNew.Data;
 using ToursNew.Models;
+
 namespace ToursNew.Services;
-
-
 
 public class ActivityLogger : IActivityLogger
 {
@@ -26,5 +25,4 @@ public class ActivityLogger : IActivityLogger
         _context.ActivityLogs.Add(log);
         await _context.SaveChangesAsync();
     }
-
 }
